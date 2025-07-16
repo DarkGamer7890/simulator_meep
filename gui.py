@@ -480,7 +480,7 @@ class MyFrame(wx.Frame):
 
         self.eps_sim, self.ez_dft = sim.sim_run()
 
-        self.plotter = plotter(self.eps_sim, self.ez_dft, self.figure, self.canvas, self.ax)
+        self.plotter = plotter(self.eps_sim, self.ez_dft, self.figure, self.canvas, self.ax, pml, resolution)
 
         print(len(self.eps_sim))
         print(len(self.ez_dft))
