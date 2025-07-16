@@ -43,7 +43,7 @@ class MyFrame(wx.Frame):
 
         #====== Left Panel =====#
         self.left_panel = wx.ScrolledWindow(self.panel, style=wx.VSCROLL)
-        self.left_panel.SetScrollRate(5, 5)
+        self.left_panel.SetScrollRate(5, 11)
         
         self.left_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -246,12 +246,14 @@ class MyFrame(wx.Frame):
 
         
         btn_row2 = wx.BoxSizer(wx.HORIZONTAL)
+        btn_row3 = wx.BoxSizer(wx.HORIZONTAL)
+
         btn_row2.Add(line_x_origin_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
         btn_row2.Add(line_x_focus_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
         btn_row2.Add(line_y_origin_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
         btn_row2.Add(line_y_focus_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row2.Add(line_z_origin_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row2.Add(line_z_focus_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row3.Add(line_z_origin_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row3.Add(line_z_focus_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
 
 
         # Mag Plane Graph Buttons
@@ -276,15 +278,15 @@ class MyFrame(wx.Frame):
 
 
 
-        btn_row3 = wx.BoxSizer(wx.HORIZONTAL)
         btn_row4 = wx.BoxSizer(wx.HORIZONTAL)
+        btn_row5 = wx.BoxSizer(wx.HORIZONTAL)
 
-        btn_row3.Add(mag_plane_origin_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row3.Add(mag_plane_focus_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row3.Add(mag_plane_origin_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row3.Add(mag_plane_focus_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row4.Add(mag_plane_origin_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row4.Add(mag_plane_focus_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row4.Add(mag_plane_origin_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row4.Add(mag_plane_focus_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row4.Add(mag_plane_origin_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row4.Add(mag_plane_focus_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row5.Add(mag_plane_origin_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row5.Add(mag_plane_focus_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
 
 
 
@@ -310,15 +312,51 @@ class MyFrame(wx.Frame):
 
 
 
-        btn_row5 = wx.BoxSizer(wx.HORIZONTAL)
         btn_row6 = wx.BoxSizer(wx.HORIZONTAL)
+        btn_row7 = wx.BoxSizer(wx.HORIZONTAL)
 
-        btn_row5.Add(phase_plane_origin_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row5.Add(phase_plane_focus_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row5.Add(phase_plane_origin_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row5.Add(phase_plane_focus_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row6.Add(phase_plane_origin_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
-        btn_row6.Add(phase_plane_focus_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row6.Add(phase_plane_origin_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row6.Add(phase_plane_focus_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row6.Add(phase_plane_origin_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row6.Add(phase_plane_focus_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row7.Add(phase_plane_origin_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row7.Add(phase_plane_focus_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+
+
+
+
+        # Contour Plots
+
+        contour_origin_xy_button = wx.Button(self.left_panel, label='XY Plane (origin)')
+        contour_origin_xy_button.Bind(wx.EVT_BUTTON, self.contour_origin_xy)
+
+        contour_focus_xy_button = wx.Button(self.left_panel, label='XY Plane (focus)')
+        contour_focus_xy_button.Bind(wx.EVT_BUTTON, self.contour_focus_xy)
+
+        contour_origin_yz_button = wx.Button(self.left_panel, label='YZ Plane (origin)')
+        contour_origin_yz_button.Bind(wx.EVT_BUTTON, self.contour_origin_yz)
+
+        contour_focus_yz_button = wx.Button(self.left_panel, label='YZ Plane (focus)')
+        contour_focus_yz_button.Bind(wx.EVT_BUTTON, self.contour_focus_yz)
+
+        contour_origin_xz_button = wx.Button(self.left_panel, label='XZ Plane (origin)')
+        contour_origin_xz_button.Bind(wx.EVT_BUTTON, self.contour_origin_xz)
+
+        contour_focus_xz_button = wx.Button(self.left_panel, label='XZ Plane (focus)')
+        contour_focus_xz_button.Bind(wx.EVT_BUTTON, self.contour_focus_xz)
+
+
+
+
+        btn_row8 = wx.BoxSizer(wx.HORIZONTAL)
+        btn_row9 = wx.BoxSizer(wx.HORIZONTAL)
+
+        btn_row8.Add(contour_origin_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row8.Add(contour_focus_xy_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row8.Add(contour_origin_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row8.Add(contour_focus_yz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row9.Add(contour_origin_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
+        btn_row9.Add(contour_focus_xz_button, 0, wx.ALIGN_BOTTOM | wx.RIGHT, 10)
 
 
 
@@ -358,14 +396,19 @@ class MyFrame(wx.Frame):
 
         grid.Add(wx.StaticText(self.left_panel, label='Line Graphs:'), pos=(13, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
         grid.Add(btn_row2, pos=(14, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(btn_row3, pos=(15, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
 
-        grid.Add(wx.StaticText(self.left_panel, label='Plane Magnitude Graphs:'), pos=(15, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
-        grid.Add(btn_row3, pos=(16, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(wx.StaticText(self.left_panel, label='Plane Magnitude Graphs:'), pos=(16, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
         grid.Add(btn_row4, pos=(17, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(btn_row5, pos=(18, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
 
-        grid.Add(wx.StaticText(self.left_panel, label='Plane Phase Graphs:'), pos=(18, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
-        grid.Add(btn_row5, pos=(19, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(wx.StaticText(self.left_panel, label='Plane Phase Graphs:'), pos=(19, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
         grid.Add(btn_row6, pos=(20, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(btn_row7, pos=(21, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+
+        grid.Add(wx.StaticText(self.left_panel, label='Contour Plots:'), pos=(22, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(btn_row8, pos=(23, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
+        grid.Add(btn_row9, pos=(24, 0), span=(1, 2), flag=wx.EXPAND | wx.ALL, border=5)
 
 
 
@@ -663,6 +706,66 @@ class MyFrame(wx.Frame):
     def phase_focus_xz(self, event):
         
         self.plotter.phase_plane_focus_xz()  # call Plotter method
+
+        # Swap views
+        self.output_console.Hide()
+        self.canvas.Show()
+        self.right_panel.Layout()
+
+
+    def contour_origin_xy(self, event):
+        
+        self.plotter.contour_origin_xy()  # call Plotter method
+
+        # Swap views
+        self.output_console.Hide()
+        self.canvas.Show()
+        self.right_panel.Layout()
+
+
+    def contour_focus_xy(self, event):
+        
+        self.plotter.contour_focus_xy()  # call Plotter method
+
+        # Swap views
+        self.output_console.Hide()
+        self.canvas.Show()
+        self.right_panel.Layout()
+
+
+    def contour_origin_yz(self, event):
+        
+        self.plotter.contour_origin_yz()  # call Plotter method
+
+        # Swap views
+        self.output_console.Hide()
+        self.canvas.Show()
+        self.right_panel.Layout()
+
+
+    def contour_focus_yz(self, event):
+        
+        self.plotter.contour_focus_yz()  # call Plotter method
+
+        # Swap views
+        self.output_console.Hide()
+        self.canvas.Show()
+        self.right_panel.Layout()
+
+
+    def contour_origin_xz(self, event):
+        
+        self.plotter.contour_origin_xz()  # call Plotter method
+
+        # Swap views
+        self.output_console.Hide()
+        self.canvas.Show()
+        self.right_panel.Layout()
+
+
+    def contour_focus_xz(self, event):
+        
+        self.plotter.contour_focus_xz()  # call Plotter method
 
         # Swap views
         self.output_console.Hide()
