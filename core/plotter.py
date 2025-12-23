@@ -1,15 +1,12 @@
 import matplotlib
-# matplotlib.use('WXAgg')
-
 from matplotlib.figure import Figure
-# from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 
 
 class Plotter():
-    def __init__(self, eps_sim, ez_dft, figure, canvas, ax, pml, resolution, is_3D):
+    def __init__(self, eps_sim, ez_dft, figure, canvas, ax, pml, resolution):
 
         # Extracting data
         self.canvas = canvas
@@ -28,7 +25,7 @@ class Plotter():
 
         # Removing PML layer
         self.crop = int(self.pml * self.resolution)
-        self.is_3D = is_3D
+        self.is_3D = (ez_dft.ndim == 3)
 
         if self.is_3D: 
             self.magnitude = self.magnitude[self.crop - 1: -self.crop, self.crop - 1: -self.crop, self.crop - 1: -self.crop]
@@ -50,79 +47,97 @@ class Plotter():
 
 
     def line_graph_origin_x(self):
-
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
         self.ax = self.figure.add_subplot(1, 1, 1)
-
-        self.ax.plot(self.extent, self.magnitude[:, self.center, self.center].T, color='blue')
+    
+        if self.is_3D:
+            ydata = self.magnitude[:, self.center, self.center]
+            xlabel = "X-axis (y=0, z=0)"
+        else:
+            ydata = self.magnitude[:, self.center]
+            xlabel = "X-axis (y=0)"
+    
+        self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
-
-        self.ax.set_xlabel('X-axis (y=0, z=0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('|Ez|', fontsize=14, fontweight='bold')
-
+    
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel("|Ez|", fontsize=14, fontweight="bold")
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-
-
-        # self.ax.figure.tight_layout()
+    
         self.figure.tight_layout()
         return self.figure
 
 
 
+
     def line_graph_focus_x(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()                   
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        self.ax.plot(self.extent, self.magnitude[:, self.coords[1], self.coords[2]].T, color='blue')
+        if self.is_3D:
+            ydata = self.magnitude[:, self.coords[1], self.coords[2]]
+            xlabel = f"X-axis (y={self.coords[1] - self.center}, z={self.coords[2] - self.center})"
+        else:
+            ydata = self.magnitude[:, self.coords[1]]
+            xlabel = f"X-axis (y={self.coords[1] - self.center})"
+
+        self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
-
-        self.ax.set_xlabel(f'X-axis (y={self.coords[1] - self.center}, z={self.coords[2] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('|Ez|', fontsize=14, fontweight='bold')
-
+    
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel("|Ez|", fontsize=14, fontweight="bold")
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-
-
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+    
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def line_graph_origin_y(self):
-
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
         self.ax = self.figure.add_subplot(1, 1, 1)
-
-        self.ax.plot(self.extent, self.magnitude[self.center, :, self.center].T, color='blue')
+    
+        if self.is_3D:
+            ydata = self.magnitude[self.center, :, self.center]
+            xlabel = "Y-axis (x=0, z=0)"
+        else:
+            ydata = self.magnitude[self.center, :]
+            xlabel = "Y-axis (y=0)"
+    
+        self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
-
-        self.ax.set_xlabel('Y-axis (x=0, z=0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('|Ez|', fontsize=14, fontweight='bold')
-
+    
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel("|Ez|", fontsize=14, fontweight="bold")
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-
-
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+    
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def line_graph_focus_y(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()                   
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        self.ax.plot(self.extent, self.magnitude[self.coords[0], :, self.coords[2]].T, color='blue')
+        if self.is_3D:
+            ydata = self.magnitude[self.coords[0], :, self.coords[2]]
+            xlabel = f"Y-axis (x={self.coords[0] - self.center}, z={self.coords[2] - self.center})"
+        else:
+            ydata = self.magnitude[self.coords[0], :]
+            xlabel = f"Y-axis (x={self.coords[0] - self.center})"
+
+        self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
-
-        self.ax.set_xlabel(f'Y-axis (x={self.coords[0] - self.center}, z={self.coords[2] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('|Ez|', fontsize=14, fontweight='bold')
-
+    
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel("|Ez|", fontsize=14, fontweight="bold")
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-
-
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+    
+        self.figure.tight_layout()
+        return self.figure
 
         
 

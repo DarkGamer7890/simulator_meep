@@ -61,6 +61,9 @@ geometry_path = None
 pitch = None
 eps = None
 
+geometry = [] 
+params = {}
+
 if geometry_type == "Import File":
     geometry_path = st.file_uploader(
         "Upload Geometry File",
@@ -70,9 +73,24 @@ if geometry_type == "Import File":
     pitch = st.number_input("Pitch", value=0.5)
     eps = st.number_input("Epsilon", value=2)
 
+    params = {
+        'path': geometry_path,
+        'pitch': pitch,
+        'epsilon': eps
+    }
+
+    
+
 elif geometry_type == "Luneberg Lens":
     radius = st.number_input("Radius", value=3)
     layers = st.number_input("Layers", value=6)
+
+    params = {
+        "radius": radius,
+        "layers": layers,
+        "cell_z": cell_z
+    }
+        
     
 
 # -------------------------
@@ -82,33 +100,25 @@ run = st.button("Run Simulation")
 
 st.title("Meep Simulator — Free Space Test")
 
-# Making Geometry
+
+
+
+if "simulation_done" not in st.session_state:
+    st.session_state.simulation_done = False
+if "plotter" not in st.session_state:
+    st.session_state.plotter = None
+if "current_fig" not in st.session_state:
+    st.session_state.current_fig = None
+
+
+
+
+# ----------------- Geometry -----------------
 
 if run:
-    geometry = [] 
-
-    params = {}
-
-    if geometry_type == "Import File":
-        params = {
-            'path': geometry_path,
-            'pitch': pitch,
-            'epsilon': eps
-        }
-
-    elif geometry_type == "Luneberg Lens":
-        params = {
-            "radius": radius,
-            "layers": layers,
-            "cell_z": cell_z
-        }
-    
     geometry = build_geometry(geometry_type, params)
 
-
-    # Simulation
-
-    
+    # ----------------- Simulation -----------------
 
     sim = SimInMeep(
         cell_size=mp.Vector3(cell_x, cell_y, cell_z),
@@ -124,11 +134,7 @@ if run:
     eps, ez = sim.sim_run()
 
 
-
-    # -------------------------
-    # Plotting
-    # -------------------------
-
+    # ----------------- Plotter -----------------
 
     # Create plot area
     plot_area = st.container()
@@ -147,75 +153,83 @@ if run:
         ax = ax,
         pml = pml,
         resolution = resolution,
-        is_3D = cell_z > 0
     )
 
-
-
-
-    ALL_BUTTONS = {
-        "Line Plots": [
-            ("Line X (origin)", "line_graph_origin_x"),
-            ("Line Y (origin)", "line_graph_origin_y"),
-            ("Line Z (origin)", "line_graph_origin_z"),
-            ("Line X (Focus)", "line_graph_focus_x"),
-            ("Line Y (Focus)", "line_graph_focus_y"),
-            ("Line Z (Focus)", "line_graph_focus_z"),
-        ],
-        "Magnitude Plots": [
-            ("Mag XY (Origin)", "mag_plane_origin_xy"),
-            ("Mag YZ (Origin)", "mag_plane_origin_yz"),
-            ("Mag XZ (Origin)", "mag_plane_origin_xz"),
-            ("Mag XY (Focus)", "mag_plane_focus_xy"),
-            ("Mag YZ (Focus)", "mag_plane_focus_yz"),
-            ("Mag XZ (Focus)", "mag_plane_focus_xz"),
-        ],
-        "Phase Plots": [
-            ("Phase XY (Origin)", "phase_plane_origin_xy"),
-            ("Phase YZ (Origin)", "phase_plane_origin_yz"),
-            ("Phase XZ (Origin)", "phase_plane_origin_xz"),
-            ("Phase XY (Focus)", "phase_plane_focus_xy"),
-            ("Phase YZ (Focus)", "phase_plane_focus_yz"),
-            ("Phase XZ (Focus)", "phase_plane_focus_xz"),
-        ]
-    }
+    st.session_state.simulation_done = True
+    st.session_state.plotter = plotter
 
 
 
 
-    num_buttons = 6 if cell_z != 0 else 4
+ALL_BUTTONS = {
+    "Line Plots": [
+        ("Line X (origin)", "line_graph_origin_x"),
+        ("Line Y (origin)", "line_graph_origin_y"),
+        ("Line Z (origin)", "line_graph_origin_z"),
+        ("Line X (Focus)", "line_graph_focus_x"),
+        ("Line Y (Focus)", "line_graph_focus_y"),
+        ("Line Z (Focus)", "line_graph_focus_z"),
+    ],
+    "Magnitude Plots": [
+        ("Mag XY (Origin)", "mag_plane_origin_xy"),
+        ("Mag YZ (Origin)", "mag_plane_origin_yz"),
+        ("Mag XZ (Origin)", "mag_plane_origin_xz"),
+        ("Mag XY (Focus)", "mag_plane_focus_xy"),
+        ("Mag YZ (Focus)", "mag_plane_focus_yz"),
+        ("Mag XZ (Focus)", "mag_plane_focus_xz"),
+    ],
+    "Phase Plots": [
+        ("Phase XY (Origin)", "phase_plane_origin_xy"),
+        ("Phase YZ (Origin)", "phase_plane_origin_yz"),
+        ("Phase XZ (Origin)", "phase_plane_origin_xz"),
+        ("Phase XY (Focus)", "phase_plane_focus_xy"),
+        ("Phase YZ (Focus)", "phase_plane_focus_yz"),
+        ("Phase XZ (Focus)", "phase_plane_focus_xz"),
+    ]
+}
 
-    VISIBLE_BUTTONS = {
-        cls: btns[:num_buttons]
-        for cls, btns in ALL_BUTTONS.items()
-    }
 
 
 
-    # Placement of Buttons
+num_buttons = 6 if cell_z != 0 else 4
 
-    def render_button_grid(buttons, class_name, plotter):
-        cols = st.columns(3)
-
-        for i, (label, method_name) in enumerate(buttons):
-            col = cols[i % 3]
-            with col:
-                if st.button(label, key=f"{class_name}_{label}"):
-                    fig = getattr(plotter, method_name)()
-                    st.session_state.current_fig = fig
+VISIBLE_BUTTONS = {
+    cls: btns[:num_buttons]
+    for cls, btns in ALL_BUTTONS.items()
+}
 
 
 
+# Placement of Buttons
+
+def render_button_grid(buttons, class_name, plotter):
+    cols = st.columns(3)
+
+    for i, (label, method_name) in enumerate(buttons):
+        col = cols[i % 3]
+
+        with col:
+            clicked = st.button(label, key=f"{class_name}_{label}", disabled=not st.session_state.simulation_done)
+
+            if clicked:
+                fig = getattr(plotter, method_name)()
+                st.session_state.current_fig = fig
+
+
+if st.session_state.plotter != None:
     for class_name, buttons in VISIBLE_BUTTONS.items():
         with st.expander(class_name):
-            render_button_grid(buttons, class_name, plotter)
+            if st.session_state.plotter is not None:
+                render_button_grid(buttons, class_name, st.session_state.plotter)
 
-    st.markdown("### Plot Output")
 
-    if "current_fig" in st.session_state:
-        st.pyplot(st.session_state.current_fig)
-    else:
-        st.info("Click a button to generate a plot")
+
+st.markdown("### Plot Output")
+
+if "current_fig" in st.session_state:
+    st.pyplot(st.session_state.current_fig)
+else:
+    st.info("Click a button to generate a plot")
 
 
 
