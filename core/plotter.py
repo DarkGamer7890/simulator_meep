@@ -103,7 +103,7 @@ class Plotter():
             xlabel = "Y-axis (x=0, z=0)"
         else:
             ydata = self.magnitude[self.center, :]
-            xlabel = "Y-axis (y=0)"
+            xlabel = "Y-axis (x=0)"
     
         self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
@@ -142,460 +142,666 @@ class Plotter():
         
 
     def line_graph_origin_z(self):
-
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
         self.ax = self.figure.add_subplot(1, 1, 1)
-
-        self.ax.plot(self.extent, self.magnitude[self.center, self.center, :].T, color='blue')
+    
+        
+        ydata = self.magnitude[self.center, self.center, :]
+        xlabel = "Z-axis (x=0, y=0)"
+    
+        self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
-
-        self.ax.set_xlabel('Z-axis (x=0, y=0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('|Ez|', fontsize=14, fontweight='bold')
-
+    
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel("|Ez|", fontsize=14, fontweight="bold")
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-
-
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+    
+        self.figure.tight_layout()
+        return self.figure
 
     
 
     def line_graph_focus_z(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()                   
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        self.ax.plot(self.extent, self.magnitude[self.coords[0], self.coords[1], :].T, color='blue')
+        
+        ydata = self.magnitude[self.coords[0], self.coords[1], :]
+        xlabel = f"Z-axis (x={self.coords[0] - self.center}, y={self.coords[1] - self.center})"
+
+        self.ax.plot(self.extent, ydata.T)
         self.ax.grid(True)
-
-        self.ax.set_xlabel(f'Z-axis (x={self.coords[0] - self.center}, y={self.coords[1] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('|Ez|', fontsize=14, fontweight='bold')
-
+    
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel("|Ez|", fontsize=14, fontweight="bold")
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-
-
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+    
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def mag_plane_origin_xy(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.magnitude[:, :, self.center].T, cmap='jet', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        if self.is_3D:
+            data = self.magnitude[:, :, self.center].T
+            xlabel = "X (z = 0)"
+            ylabel = "Y"
+        else:
+            data = self.magnitude.T
+            xlabel = "X"
+            ylabel = "Y"
 
-        self.ax.set_xlabel('X (z = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Y', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="jet",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def mag_plane_focus_xy(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.magnitude[:, :, self.coords[2]].T, cmap='jet', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        # 3D: take XY slice at z = center
+        data = self.magnitude[:, :, self.coords[2]].T
+        xlabel = f"X (z = {self.coords[2] - self.center})"
+        ylabel = "Y"
 
-        self.ax.set_xlabel(f'X (z = {self.coords[2] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Y', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="jet",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
     
 
     def mag_plane_origin_yz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.magnitude[self.center, :, :].T, cmap='jet', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        
+        data = self.magnitude[self.center, :, :].T
+        xlabel = "Y (x = 0)"
+        ylabel = "Z"
 
-        self.ax.set_xlabel('Y (x = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="jet",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
-
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def mag_plane_focus_yz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.magnitude[self.coords[0], :, :].T, cmap='jet', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        # 3D: take XY slice at z = center
+        data = self.magnitude[self.coords[0], :, :].T
+        xlabel = f"Y (x = {self.coords[0] - self.center})"
+        ylabel = "Z"
 
-        self.ax.set_xlabel(f'Y (x = {self.coords[0] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="jet",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def mag_plane_origin_xz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.magnitude[:, self.center, :].T, cmap='jet', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        
+        data = self.magnitude[:, self.center, :].T
+        xlabel = "X (y = 0)"
+        ylabel = "Z"
 
-        self.ax.set_xlabel('X (y = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="jet",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
-
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def mag_plane_focus_xz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.magnitude[:, self.coords[1], :].T, cmap='jet', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        # 3D: take XY slice at z = center
+        data = self.magnitude[:, self.coords[1], :].T
+        xlabel = f"X (y = {self.coords[1] - self.center})"
+        ylabel = "Z"
 
-        self.ax.set_xlabel(f'X (y = {self.coords[1] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="jet",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def phase_plane_origin_xy(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.phase[:, :, self.center].T, cmap='Blues', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        if self.is_3D:
+            data = self.phase[:, :, self.center].T
+            xlabel = "X (z = 0)"
+            ylabel = "Y"
+        else:
+            data = self.magnitude.T
+            xlabel = "X"
+            ylabel = "Y"
 
-        self.ax.set_xlabel('X (z = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Y', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="Blues",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def phase_plane_focus_xy(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.phase[:, :, self.coords[2]].T, cmap='Blues', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        # 3D: take XY slice at z = center
+        data = self.phase[:, :, self.coords[2]].T
+        xlabel = f"X (z = {self.coords[2] - self.center})"
+        ylabel = "Y"
 
-        self.ax.set_xlabel(f'X (z = {self.coords[2] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Y', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="Blues",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
     
 
     def phase_plane_origin_yz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.phase[self.center, :, :].T, cmap='Blues', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        
+        data = self.phase[self.center, :, :].T
+        xlabel = "Y (x = 0)"
+        ylabel = "Z"
 
-        self.ax.set_xlabel('Y (x = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="Blues",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
-
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def phase_plane_focus_yz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.phase[self.coords[0], :, :].T, cmap='Blues', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        # 3D: take XY slice at z = center
+        data = self.phase[self.coords[0], :, :].T
+        xlabel = f"Y (x = {self.coords[0] - self.center})"
+        ylabel = "Z"
 
-        self.ax.set_xlabel(f'Y (x = {self.coords[0] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="Blues",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def phase_plane_origin_xz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.phase[:, self.center, :].T, cmap='Blues', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        
+        data = self.phase[:, self.center, :].T
+        xlabel = "X (y = 0)"
+        ylabel = "Z"
 
-        self.ax.set_xlabel('X (y = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="Blues",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def phase_plane_focus_xz(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        im = self.ax.imshow(self.phase[:, self.coords[1], :].T, cmap='Blues', origin='lower', extent=[-self.limit, self.limit, -self.limit, self.limit])
-        self.colorbar = self.ax.figure.colorbar(im, ax=self.ax)
+        # 3D: take XY slice at z = center
+        data = self.phase[:, self.coords[1], :].T
+        xlabel = f"X (y = {self.coords[1] - self.center})"
+        ylabel = "Z"
 
-        self.ax.set_xlabel(f'X (y = {self.coords[1] - self.center})', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        im = self.ax.imshow(
+            data,
+            cmap="Blues",
+            origin="lower",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
+
+        self.colorbar = self.figure.colorbar(im, ax=self.ax)
+
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.figure.tight_layout()
+        return self.figure
 
 
 
     def contour_origin_xy(self):
 
-        self.figure.clf()                    # Clears everything
+        self.figure.clf()
+        self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
         levels = np.arange(0, 1.01, 0.2)
 
+        # Select data slice
+        if self.is_3D:
+            data = self.magnitude[:, :, self.center]
+            xlabel = "X (z = 0)"
+            ylabel = "Y"
+        else:
+            data = self.magnitude
+            xlabel = "X"
+            ylabel = "Y"
+
+        # Normalize safely
+        norm = data / (np.max(data) + 1e-6)
+
         cs = self.ax.contour(
-            self.magnitude[:, :, self.center].T / (np.max(self.magnitude[:, :, self.center]) + 1e-6),
+            norm.T,
             levels=levels,
-            cmap='jet',
-            origin='lower',
-            linestyles='-',
-            extent=[-self.limit, self.limit, -self.limit, self.limit]
+            cmap="jet",
+            origin="lower",
+            linestyles="-",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
         )
 
-
-        self.ax.set_xlabel('X (z = 0)', fontsize=14, fontweight='bold')
-        self.ax.set_ylabel('Y', fontsize=14, fontweight='bold')
-
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
         self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
         self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-        self.colorbar = self.ax.figure.colorbar(cs, ax=self.ax)
-        self.ax.grid(True)
+        # Safe colorbar creation
+        self.colorbar = self.figure.colorbar(cs, ax=self.ax)
 
-        self.ax.figure.tight_layout()
-        self.canvas.draw()
+        self.ax.grid(True)
+        self.figure.tight_layout()
+
+        return self.figure
 
 
 
     def contour_focus_xy(self):
 
-            self.figure.clf()                    # Clears everything
-            self.ax = self.figure.add_subplot(1, 1, 1)
+        self.figure.clf()
+        self.colorbar = None
+        self.ax = self.figure.add_subplot(1, 1, 1)
 
-            levels = np.arange(0, 1.01, 0.2)
+        levels = np.arange(0, 1.01, 0.2)
 
-            cs = self.ax.contour(
-                self.magnitude[:, :, self.coords[2]].T / (np.max(self.magnitude[:, :, self.coords[2]]) + 1e-6),
-                levels=levels,
-                cmap='jet',
-                origin='lower',
-                linestyles='-',
-                extent=[-self.limit, self.limit, -self.limit, self.limit]
-            )
+        data = self.magnitude[:, :, self.coords[2]]
+        xlabel = f"X (z = {self.coords[2] - self.center})"
+        ylabel = "Y"
 
+        # Normalize safely
+        norm = data / (np.max(data) + 1e-6)
 
-            self.ax.set_xlabel(f'X (z = {self.coords[2] - self.center})', fontsize=14, fontweight='bold')
-            self.ax.set_ylabel('Y', fontsize=14, fontweight='bold')
+        cs = self.ax.contour(
+            norm.T,
+            levels=levels,
+            cmap="jet",
+            origin="lower",
+            linestyles="-",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
 
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
-            self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-            self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-            self.colorbar = self.ax.figure.colorbar(cs, ax=self.ax)
-            self.ax.grid(True)
+        # Safe colorbar creation
+        self.colorbar = self.figure.colorbar(cs, ax=self.ax)
 
-            self.ax.figure.tight_layout()
-            self.canvas.draw()
+        self.ax.grid(True)
+        self.figure.tight_layout()
+
+        return self.figure
 
 
 
     def contour_origin_yz(self):
 
-            self.figure.clf()                    # Clears everything
-            self.ax = self.figure.add_subplot(1, 1, 1)
+        self.figure.clf()
+        self.colorbar = None
+        self.ax = self.figure.add_subplot(1, 1, 1)
 
-            levels = np.arange(0, 1.01, 0.2)
+        levels = np.arange(0, 1.01, 0.2)
 
-            cs = self.ax.contour(
-                self.magnitude[self.center, :, :].T / (np.max(self.magnitude[self.center, :, :]) + 1e-6),
-                levels=levels,
-                cmap='jet',
-                origin='lower',
-                linestyles='-',
-                extent=[-self.limit, self.limit, -self.limit, self.limit]
-            )
+        data = self.magnitude[self.center, :, :]
+        xlabel = "Y (x = 0)"
+        ylabel = "Z"
 
+        # Normalize safely
+        norm = data / (np.max(data) + 1e-6)
 
-            self.ax.set_xlabel('Y (x = 0)', fontsize=14, fontweight='bold')
-            self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        cs = self.ax.contour(
+            norm.T,
+            levels=levels,
+            cmap="jet",
+            origin="lower",
+            linestyles="-",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
 
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
-            self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-            self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-            self.colorbar = self.ax.figure.colorbar(cs, ax=self.ax)
-            self.ax.grid(True)
+        # Safe colorbar creation
+        self.colorbar = self.figure.colorbar(cs, ax=self.ax)
 
-            self.ax.figure.tight_layout()
-            self.canvas.draw()
+        self.ax.grid(True)
+        self.figure.tight_layout()
+
+        return self.figure
 
 
 
     def contour_focus_yz(self):
 
-            self.figure.clf()                    # Clears everything
-            self.ax = self.figure.add_subplot(1, 1, 1)
+        self.figure.clf()
+        self.colorbar = None
+        self.ax = self.figure.add_subplot(1, 1, 1)
 
-            levels = np.arange(0, 1.01, 0.2)
+        levels = np.arange(0, 1.01, 0.2)
 
-            cs = self.ax.contour(
-                self.magnitude[self.coords[0], :, :].T / (np.max(self.magnitude[self.coords[0], :, :]) + 1e-6),
-                levels=levels,
-                cmap='jet',
-                origin='lower',
-                linestyles='-',
-                extent=[-self.limit, self.limit, -self.limit, self.limit]
-            )
+        data = self.magnitude[self.coords[0], :, :]
+        xlabel = f"Y (x = {self.coords[0] - self.center})"
+        ylabel = "Z"
 
+        # Normalize safely
+        norm = data / (np.max(data) + 1e-6)
 
-            self.ax.set_xlabel(f'Y (x = {self.coords[0] - self.center})', fontsize=14, fontweight='bold')
-            self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        cs = self.ax.contour(
+            norm.T,
+            levels=levels,
+            cmap="jet",
+            origin="lower",
+            linestyles="-",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
 
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
-            self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-            self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-            self.colorbar = self.ax.figure.colorbar(cs, ax=self.ax)
-            self.ax.grid(True)
+        # Safe colorbar creation
+        self.colorbar = self.figure.colorbar(cs, ax=self.ax)
 
-            self.ax.figure.tight_layout()
-            self.canvas.draw()
+        self.ax.grid(True)
+        self.figure.tight_layout()
+
+        return self.figure
 
 
 
     def contour_origin_xz(self):
 
-            self.figure.clf()                    # Clears everything
-            self.ax = self.figure.add_subplot(1, 1, 1)
+        self.figure.clf()
+        self.colorbar = None
+        self.ax = self.figure.add_subplot(1, 1, 1)
 
-            levels = np.arange(0, 1.01, 0.2)
+        levels = np.arange(0, 1.01, 0.2)
 
-            cs = self.ax.contour(
-                self.magnitude[:, self.center, :].T / (np.max(self.magnitude[:, self.center, :]) + 1e-6),
-                levels=levels,
-                cmap='jet',
-                origin='lower',
-                linestyles='-',
-                extent=[-self.limit, self.limit, -self.limit, self.limit]
-            )
+        data = self.magnitude[:, self.center, :]
+        xlabel = "X (y = 0)"
+        ylabel = "Z"
 
+        # Normalize safely
+        norm = data / (np.max(data) + 1e-6)
 
-            self.ax.set_xlabel('X (y = 0)', fontsize=14, fontweight='bold')
-            self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        cs = self.ax.contour(
+            norm.T,
+            levels=levels,
+            cmap="jet",
+            origin="lower",
+            linestyles="-",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
 
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
-            self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-            self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-            self.colorbar = self.ax.figure.colorbar(cs, ax=self.ax)
-            self.ax.grid(True)
+        # Safe colorbar creation
+        self.colorbar = self.figure.colorbar(cs, ax=self.ax)
 
-            self.ax.figure.tight_layout()
-            self.canvas.draw()
+        self.ax.grid(True)
+        self.figure.tight_layout()
+
+        return self.figure
 
 
 
     def contour_focus_xz(self):
 
-            self.figure.clf()                    # Clears everything
-            self.ax = self.figure.add_subplot(1, 1, 1)
+        self.figure.clf()
+        self.colorbar = None
+        self.ax = self.figure.add_subplot(1, 1, 1)
 
-            levels = np.arange(0, 1.01, 0.2)
+        levels = np.arange(0, 1.01, 0.2)
 
-            cs = self.ax.contour(
-                self.magnitude[:, self.coords[1], :].T / (np.max(self.magnitude[:, self.coords[1], :]) + 1e-6),
-                levels=levels,
-                cmap='jet',
-                origin='lower',
-                linestyles='-',
-                extent=[-self.limit, self.limit, -self.limit, self.limit]
-            )
+        data = self.magnitude[:, self.coords[1], :]
+        xlabel = f"X (y = {self.coords[1] - self.center})"
+        ylabel = "Z"
 
+        # Normalize safely
+        norm = data / (np.max(data) + 1e-6)
 
-            self.ax.set_xlabel(f'X (y = {self.coords[1] - self.center})', fontsize=14, fontweight='bold')
-            self.ax.set_ylabel('Z', fontsize=14, fontweight='bold')
+        cs = self.ax.contour(
+            norm.T,
+            levels=levels,
+            cmap="jet",
+            origin="lower",
+            linestyles="-",
+            extent=[-self.limit, self.limit, -self.limit, self.limit],
+        )
 
+        self.ax.set_xlabel(xlabel, fontsize=14, fontweight="bold")
+        self.ax.set_ylabel(ylabel, fontsize=14, fontweight="bold")
 
-            self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
-            self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_xticks(np.arange(-self.limit, self.limit + 1))
+        self.ax.set_yticks(np.arange(-self.limit, self.limit + 1))
 
-            self.colorbar = self.ax.figure.colorbar(cs, ax=self.ax)
-            self.ax.grid(True)
+        # Safe colorbar creation
+        self.colorbar = self.figure.colorbar(cs, ax=self.ax)
 
-            self.ax.figure.tight_layout()
-            self.canvas.draw()    
+        self.ax.grid(True)
+        self.figure.tight_layout()
+
+        return self.figure

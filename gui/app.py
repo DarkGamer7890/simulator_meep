@@ -105,10 +105,13 @@ st.title("Meep Simulator — Free Space Test")
 
 if "simulation_done" not in st.session_state:
     st.session_state.simulation_done = False
+
 if "plotter" not in st.session_state:
     st.session_state.plotter = None
+
 if "current_fig" not in st.session_state:
     st.session_state.current_fig = None
+
 
 
 
@@ -116,6 +119,10 @@ if "current_fig" not in st.session_state:
 # ----------------- Geometry -----------------
 
 if run:
+    st.session_state.simulation_done = False
+    st.session_state.plotter = None
+    st.session_state.current_fig = None
+
     geometry = build_geometry(geometry_type, params)
 
     # ----------------- Simulation -----------------
@@ -132,6 +139,8 @@ if run:
     )
 
     eps, ez = sim.sim_run()
+    st.session_state.simulation_done = True
+    st.session_state.ez_ndim = ez.ndim
 
 
     # ----------------- Plotter -----------------
@@ -155,58 +164,57 @@ if run:
         resolution = resolution,
     )
 
-    st.session_state.simulation_done = True
     st.session_state.plotter = plotter
 
 
 
+if st.session_state.simulation_done:
+    is_3d = st.session_state.ez_ndim == 3
 
-ALL_BUTTONS = {
-    "Line Plots": [
-        ("Line X (origin)", "line_graph_origin_x"),
-        ("Line Y (origin)", "line_graph_origin_y"),
-        ("Line Z (origin)", "line_graph_origin_z"),
-        ("Line X (Focus)", "line_graph_focus_x"),
-        ("Line Y (Focus)", "line_graph_focus_y"),
-        ("Line Z (Focus)", "line_graph_focus_z"),
-    ],
-    "Magnitude Plots": [
-        ("Mag XY (Origin)", "mag_plane_origin_xy"),
-        ("Mag YZ (Origin)", "mag_plane_origin_yz"),
-        ("Mag XZ (Origin)", "mag_plane_origin_xz"),
-        ("Mag XY (Focus)", "mag_plane_focus_xy"),
-        ("Mag YZ (Focus)", "mag_plane_focus_yz"),
-        ("Mag XZ (Focus)", "mag_plane_focus_xz"),
-    ],
-    "Phase Plots": [
-        ("Phase XY (Origin)", "phase_plane_origin_xy"),
-        ("Phase YZ (Origin)", "phase_plane_origin_yz"),
-        ("Phase XZ (Origin)", "phase_plane_origin_xz"),
-        ("Phase XY (Focus)", "phase_plane_focus_xy"),
-        ("Phase YZ (Focus)", "phase_plane_focus_yz"),
-        ("Phase XZ (Focus)", "phase_plane_focus_xz"),
-    ]
-}
-
-
-
-
-num_buttons = 6 if cell_z != 0 else 4
-
-VISIBLE_BUTTONS = {
-    cls: btns[:num_buttons]
-    for cls, btns in ALL_BUTTONS.items()
-}
+    ALL_BUTTONS = {
+        "Line Plots": [
+            ("Line X (origin)", "line_graph_origin_x", True),
+            ("Line X (Focus)", "line_graph_focus_x", True),
+            ("Line Y (origin)", "line_graph_origin_y", True),
+            ("Line Y (Focus)", "line_graph_focus_y", True),
+            ("Line Z (origin)", "line_graph_origin_z", is_3d),
+            ("Line Z (Focus)", "line_graph_focus_z", is_3d),
+        ],
+        "Magnitude Plots": [
+            ("Mag XY (Origin)", "mag_plane_origin_xy", True),
+            ("Mag XY (Focus)", "mag_plane_focus_xy", is_3d),
+            ("Mag YZ (Origin)", "mag_plane_origin_yz", is_3d),
+            ("Mag YZ (Focus)", "mag_plane_focus_yz", is_3d),
+            ("Mag XZ (Origin)", "mag_plane_origin_xz", is_3d),
+            ("Mag XZ (Focus)", "mag_plane_focus_xz", is_3d),
+        ],
+        "Phase Plots": [
+            ("Phase XY (Origin)", "phase_plane_origin_xy", True),
+            ("Phase XY (Focus)", "phase_plane_focus_xy", is_3d),
+            ("Phase YZ (Origin)", "phase_plane_origin_yz", is_3d),
+            ("Phase YZ (Focus)", "phase_plane_focus_yz", is_3d),
+            ("Phase XZ (Origin)", "phase_plane_origin_xz", is_3d),
+            ("Phase XZ (Focus)", "phase_plane_focus_xz", is_3d),
+        ],
+        "Contour Plots": [
+            ("Contour XY (Origin)", "contour_origin_xy", True),
+            ("Contour XY (Focus)", "contour_focus_xy", is_3d),
+            ("Contour YZ (Origin)", "contour_origin_yz", is_3d),
+            ("Contour YZ (Focus)", "contour_focus_yz", is_3d),
+            ("Contour XZ (Origin)", "contour_origin_xz", is_3d),
+            ("Contour XZ (Focus)", "contour_focus_xz", is_3d),
+        ]
+    }
 
 
 
 # Placement of Buttons
 
 def render_button_grid(buttons, class_name, plotter):
-    cols = st.columns(3)
+    cols = st.columns(2)
 
     for i, (label, method_name) in enumerate(buttons):
-        col = cols[i % 3]
+        col = cols[i % 2]
 
         with col:
             clicked = st.button(label, key=f"{class_name}_{label}", disabled=not st.session_state.simulation_done)
@@ -216,20 +224,26 @@ def render_button_grid(buttons, class_name, plotter):
                 st.session_state.current_fig = fig
 
 
-if st.session_state.plotter != None:
-    for class_name, buttons in VISIBLE_BUTTONS.items():
+if st.session_state.plotter is not None:
+    for class_name, button_list in ALL_BUTTONS.items():
         with st.expander(class_name):
-            if st.session_state.plotter is not None:
-                render_button_grid(buttons, class_name, st.session_state.plotter)
+            visible = [
+                (label, method)
+                for label, method, toggle in button_list
+                if toggle
+            ]
+            render_button_grid(visible, class_name, st.session_state.plotter)
 
 
 
-st.markdown("### Plot Output")
 
-if "current_fig" in st.session_state:
-    st.pyplot(st.session_state.current_fig)
-else:
-    st.info("Click a button to generate a plot")
+if st.session_state.simulation_done:
+    st.markdown("### Plot Output")
+
+    if st.session_state.current_fig:
+        st.pyplot(st.session_state.current_fig)
+    else:
+        st.info("Click a button to generate a plot")
 
 
 
