@@ -263,7 +263,6 @@ if st.session_state.simulation_done:
             )
 
             kwargs["normalize"] = st.toggle("normalize")
-            st.info(kwargs["normalize"])
 
         fig = plotter.plot(active["method"], **kwargs)
 
