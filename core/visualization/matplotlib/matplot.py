@@ -44,11 +44,66 @@ class Plotter():
         max_index = np.argmax(self.magnitude)
         self.coords = np.unravel_index(max_index, self.magnitude.shape)
 
+        self.capabilities = {
+            "line_graph_origin_x": True,
+            "line_graph_origin_y": True,
+            "line_graph_origin_z": self.is_3D,
+
+            "line_graph_focus_x": True,
+            "line_graph_focus_y": True,
+            "line_graph_focus_z": self.is_3D,
+
+            "mag_plane_origin_xy": True,
+            "mag_plane_origin_yz": self.is_3D,
+            "mag_plane_origin_xz": self.is_3D,
+
+            "mag_plane_focus_xy": self.is_3D,
+            "mag_plane_focus_yz": self.is_3D,
+            "mag_plane_focus_xz": self.is_3D,
+
+            "phase_plane_origin_xy": True,
+            "phase_plane_origin_yz": self.is_3D,
+            "phase_plane_origin_xz": self.is_3D,
+
+            "phase_plane_focus_xy": self.is_3D,
+            "phase_plane_focus_yz": self.is_3D,
+            "phase_plane_focus_xz": self.is_3D,
+
+            "contour_origin_xy": True,
+            "contour_origin_yz": self.is_3D,
+            "contour_origin_xz": self.is_3D,
+
+            "contour_focus_xy": self.is_3D,
+            "contour_focus_yz": self.is_3D,
+            "contour_focus_xz": self.is_3D,
+        }
+
+
+
+
+    def plot(self, method_name: str):
+        """
+        Safely call a plotting method by name.
+        """
+        if not self.capabilities.get(method_name, False):
+            return None
+    
+        method = getattr(self, method_name, None)
+        if method is None:
+            return None
+    
+        return method()
+    
+
+
+    def _reset_axis(self):
+        self.figure.clf()
+        self.ax = self.figure.add_subplot(1, 1, 1)   
+
 
 
     def line_graph_origin_x(self):
-        self.figure.clf()
-        self.ax = self.figure.add_subplot(1, 1, 1)
+        self._reset_axis()
     
         if self.is_3D:
             ydata = self.magnitude[:, self.center, self.center]
@@ -95,8 +150,8 @@ class Plotter():
 
 
     def line_graph_origin_y(self):
-        self.figure.clf()
-        self.ax = self.figure.add_subplot(1, 1, 1)
+
+        self._reset_axis()
     
         if self.is_3D:
             ydata = self.magnitude[self.center, :, self.center]
@@ -142,8 +197,11 @@ class Plotter():
         
 
     def line_graph_origin_z(self):
-        self.figure.clf()
-        self.ax = self.figure.add_subplot(1, 1, 1)
+
+        if not self.is_3D:
+            return None
+    
+        self._reset_axis()
     
         
         ydata = self.magnitude[self.center, self.center, :]
@@ -162,6 +220,9 @@ class Plotter():
     
 
     def line_graph_focus_z(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()                   
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -219,6 +280,9 @@ class Plotter():
 
     def mag_plane_focus_xy(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -249,6 +313,9 @@ class Plotter():
     
 
     def mag_plane_origin_yz(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()
         self.colorbar = None
@@ -281,6 +348,9 @@ class Plotter():
 
     def mag_plane_focus_yz(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -312,6 +382,9 @@ class Plotter():
 
     def mag_plane_origin_xz(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -342,6 +415,9 @@ class Plotter():
 
 
     def mag_plane_focus_xz(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()
         self.colorbar = None
@@ -409,6 +485,9 @@ class Plotter():
 
     def phase_plane_focus_xy(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -439,6 +518,9 @@ class Plotter():
     
 
     def phase_plane_origin_yz(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()
         self.colorbar = None
@@ -471,6 +553,9 @@ class Plotter():
 
     def phase_plane_focus_yz(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -502,6 +587,9 @@ class Plotter():
 
     def phase_plane_origin_xz(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -532,6 +620,9 @@ class Plotter():
 
 
     def phase_plane_focus_xz(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()
         self.colorbar = None
@@ -610,6 +701,9 @@ class Plotter():
 
     def contour_focus_xy(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -649,6 +743,9 @@ class Plotter():
 
 
     def contour_origin_yz(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()
         self.colorbar = None
@@ -690,6 +787,9 @@ class Plotter():
 
     def contour_focus_yz(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -730,6 +830,9 @@ class Plotter():
 
     def contour_origin_xz(self):
 
+        if not self.is_3D:
+            return None
+
         self.figure.clf()
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
@@ -769,6 +872,9 @@ class Plotter():
 
 
     def contour_focus_xz(self):
+
+        if not self.is_3D:
+            return None
 
         self.figure.clf()
         self.colorbar = None

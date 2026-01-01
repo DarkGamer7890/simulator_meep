@@ -6,9 +6,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from core.sim_in_meep import SimInMeep
-from core.geometry_factory import build_geometry
+from core.geometry.geometry_factory import build_geometry
+from core.visualization.simulationData import SimulationData
+from core.solver.meep_solver import MeepSolver
+from core.visualization.plotly.base import PlotlyPlotter
 
-from core.plotter import Plotter
+
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -109,9 +112,11 @@ if "simulation_done" not in st.session_state:
 if "plotter" not in st.session_state:
     st.session_state.plotter = None
 
-if "current_fig" not in st.session_state:
-    st.session_state.current_fig = None
-
+if "active_plot" not in st.session_state:
+    st.session_state.active_plot = {
+        "method": None,
+        "category": None,
+    }
 
 
 
@@ -121,7 +126,10 @@ if "current_fig" not in st.session_state:
 if run:
     st.session_state.simulation_done = False
     st.session_state.plotter = None
-    st.session_state.current_fig = None
+    st.session_state.active_plot = {
+        "method": None,
+        "category": None,
+    }
 
     geometry = build_geometry(geometry_type, params)
 
@@ -138,7 +146,10 @@ if run:
         time=sim_time
     )
 
-    eps, ez = sim.sim_run()
+    # eps, ez = sim.sim_run()
+    solver = MeepSolver(sim)
+    eps, ez = solver.run()
+
     st.session_state.simulation_done = True
     st.session_state.ez_ndim = ez.ndim
 
@@ -154,12 +165,9 @@ if run:
     canvas = fig.canvas
 
 
-    plotter = Plotter(
+    plotter = SimulationData(
         eps_sim = eps,
         ez_dft = ez,
-        figure = fig,
-        canvas = canvas,
-        ax = ax,
         pml = pml,
         resolution = resolution,
     )
@@ -169,70 +177,72 @@ if run:
 
 
 if st.session_state.simulation_done:
-    is_3d = st.session_state.ez_ndim == 3
 
     ALL_BUTTONS = {
         "Line Plots": [
-            ("Line X (origin)", "line_graph_origin_x", True),
-            ("Line X (Focus)", "line_graph_focus_x", True),
-            ("Line Y (origin)", "line_graph_origin_y", True),
-            ("Line Y (Focus)", "line_graph_focus_y", True),
-            ("Line Z (origin)", "line_graph_origin_z", is_3d),
-            ("Line Z (Focus)", "line_graph_focus_z", is_3d),
+            ("Line X (origin)", "line_origin_x"),
+            ("Line X (Focus)", "line_focus_x"),
+            ("Line Y (origin)", "line_origin_y"),
+            ("Line Y (Focus)", "line_focus_y"),
+            ("Line Z (origin)", "line_origin_z"),
+            ("Line Z (Focus)", "line_focus_z"),
         ],
         "Magnitude Plots": [
-            ("Mag XY (Origin)", "mag_plane_origin_xy", True),
-            ("Mag XY (Focus)", "mag_plane_focus_xy", is_3d),
-            ("Mag YZ (Origin)", "mag_plane_origin_yz", is_3d),
-            ("Mag YZ (Focus)", "mag_plane_focus_yz", is_3d),
-            ("Mag XZ (Origin)", "mag_plane_origin_xz", is_3d),
-            ("Mag XZ (Focus)", "mag_plane_focus_xz", is_3d),
+            ("Mag XY (Origin)", "mag_plane_origin_xy"),
+            ("Mag XY (Focus)", "mag_plane_focus_xy"),
+            ("Mag YZ (Origin)", "mag_plane_origin_yz"),
+            ("Mag YZ (Focus)", "mag_plane_focus_yz"),
+            ("Mag XZ (Origin)", "mag_plane_origin_xz"),
+            ("Mag XZ (Focus)", "mag_plane_focus_xz"),
         ],
         "Phase Plots": [
-            ("Phase XY (Origin)", "phase_plane_origin_xy", True),
-            ("Phase XY (Focus)", "phase_plane_focus_xy", is_3d),
-            ("Phase YZ (Origin)", "phase_plane_origin_yz", is_3d),
-            ("Phase YZ (Focus)", "phase_plane_focus_yz", is_3d),
-            ("Phase XZ (Origin)", "phase_plane_origin_xz", is_3d),
-            ("Phase XZ (Focus)", "phase_plane_focus_xz", is_3d),
+            ("Phase XY (Origin)", "phase_plane_origin_xy"),
+            ("Phase XY (Focus)", "phase_plane_focus_xy"),
+            ("Phase YZ (Origin)", "phase_plane_origin_yz"),
+            ("Phase YZ (Focus)", "phase_plane_focus_yz"),
+            ("Phase XZ (Origin)", "phase_plane_origin_xz"),
+            ("Phase XZ (Focus)", "phase_plane_focus_xz"),
         ],
         "Contour Plots": [
-            ("Contour XY (Origin)", "contour_origin_xy", True),
-            ("Contour XY (Focus)", "contour_focus_xy", is_3d),
-            ("Contour YZ (Origin)", "contour_origin_yz", is_3d),
-            ("Contour YZ (Focus)", "contour_focus_yz", is_3d),
-            ("Contour XZ (Origin)", "contour_origin_xz", is_3d),
-            ("Contour XZ (Focus)", "contour_focus_xz", is_3d),
+            ("Contour XY (Origin)", "contour_origin_xy"),
+            ("Contour XY (Focus)", "contour_focus_xy"),
+            ("Contour YZ (Origin)", "contour_origin_yz"),
+            ("Contour YZ (Focus)", "contour_focus_yz"),
+            ("Contour XZ (Origin)", "contour_origin_xz"),
+            ("Contour XZ (Focus)", "contour_focus_xz"),
         ]
     }
 
-
-
+    
 # Placement of Buttons
-
 def render_button_grid(buttons, class_name, plotter):
     cols = st.columns(2)
+    caps = plotter.capabilities
 
     for i, (label, method_name) in enumerate(buttons):
-        col = cols[i % 2]
+        if not caps.get(method_name, False):
+            continue 
 
-        with col:
-            clicked = st.button(label, key=f"{class_name}_{label}", disabled=not st.session_state.simulation_done)
+        with cols[i % 2]:
+            if st.button(label, key=f"{class_name}_{label}"):
+                st.session_state.active_plot = {
+                    "method": method_name,
+                    "category": class_name,
+                }
 
-            if clicked:
-                fig = getattr(plotter, method_name)()
-                st.session_state.current_fig = fig
 
 
 if st.session_state.plotter is not None:
+    plotter = PlotlyPlotter(st.session_state.plotter)           # common name plotter if i want to change plotter in future
+
     for class_name, button_list in ALL_BUTTONS.items():
         with st.expander(class_name):
-            visible = [
-                (label, method)
-                for label, method, toggle in button_list
-                if toggle
-            ]
-            render_button_grid(visible, class_name, st.session_state.plotter)
+            render_button_grid(
+                button_list,
+                class_name,
+                plotter                       
+            )
+
 
 
 
@@ -240,10 +250,26 @@ if st.session_state.plotter is not None:
 if st.session_state.simulation_done:
     st.markdown("### Plot Output")
 
-    if st.session_state.current_fig:
-        st.pyplot(st.session_state.current_fig)
-    else:
+    active = st.session_state.active_plot
+    if active["method"] is None:
         st.info("Click a button to generate a plot")
+    else:
+        kwargs = {}
+
+        if active["category"] == "Contour Plots":
+            kwargs["contour_levels"] = st.slider(
+                "Contour levels",
+                10, 40, 15, 1
+            )
+
+            kwargs["normalize"] = st.toggle("normalize")
+            st.info(kwargs["normalize"])
+
+        fig = plotter.plot(active["method"], **kwargs)
+
+        if fig is not None:
+            st.plotly_chart(fig, use_container_width=True)
+
 
 
 

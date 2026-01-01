@@ -1,4 +1,4 @@
-from core.geometry import Geometry
+from core.geometry.geometry import Geometry
 from core.importer import Importer
 
 def build_geometry(geom_type, params):
