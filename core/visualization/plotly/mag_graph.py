@@ -16,9 +16,9 @@ class MagGraphPlotter:
 
     def origin_xy(self):
         if self.is_3D:
-            z_slice = self.mag[:, :, self.center]
+            z_slice = self.mag[:, :, self.center].T
         else:
-            z_slice = self.mag
+            z_slice = self.mag.T
 
         fig = go.Figure(
             go.Heatmap(
@@ -48,7 +48,7 @@ class MagGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.mag[:, :, self.coords[2]],
+                z=self.mag[:, :, self.coords[2]].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Jet",
@@ -74,7 +74,7 @@ class MagGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.mag[self.center, :, :],
+                z=self.mag[self.center, :, :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Jet",
@@ -100,7 +100,7 @@ class MagGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.mag[self.coords[0], :, :],
+                z=self.mag[self.coords[0], :, :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Jet",
@@ -126,7 +126,7 @@ class MagGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.mag[:, self.center, :],
+                z=self.mag[:, self.center, :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Jet",
@@ -152,7 +152,7 @@ class MagGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.mag[:, self.coords[1], :],
+                z=self.mag[:, self.coords[1], :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Jet",

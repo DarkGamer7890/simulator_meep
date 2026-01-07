@@ -29,6 +29,7 @@ def apply_common_layout(fig, title, xlabel, ylabel, spatial):
             ticks="outside",
             tickfont=dict(color="black"),
             zeroline=False,
+            constrain="domain"
             # scaleanchor="y", 
             # scaleratio=1
         ),
@@ -45,8 +46,8 @@ def apply_common_layout(fig, title, xlabel, ylabel, spatial):
             tickfont=dict(color="black"),
             zeroline=False,
             scaleanchor="x", 
-            scaleratio=1
-            # constrain="domain"
+            scaleratio=1,
+            constrain="domain"
         ),
     )
 

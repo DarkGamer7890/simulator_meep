@@ -1,5 +1,6 @@
 import meep as mp
 import numpy as np
+from .geometry.primitives.sphere import Sphere
 
 
 class SimInMeep():
@@ -13,27 +14,11 @@ class SimInMeep():
         self.geometry = geometry
         self.time = time
 
+    def geomConversion(self):
+        return [obj.to_meep() for obj in self.geometry]
+
     def sim_run(self):
         pml_layer = [mp.PML(self.pml)]
-
-        # geometry = []
-        # xx = []
-        # yy = []
-        # zz = []
-
-        # for center in self.filled_vox:
-        
-        #     xx.append(center[0])
-        #     yy.append(center[1])
-        #     zz.append(center[2])
-
-        #     geometry.append(
-        #         mp.Block(
-        #             size=mp.Vector3(self.pitch, self.pitch, self.pitch),  # small voxel approximation
-        #             center=center,
-        #             material=mp.Medium(epsilon=self.epsilon)
-        #         )
-        #     )
         
         source = mp.Source(
             src=mp.ContinuousSource(frequency=self.frequency, is_integrated=True),
@@ -45,7 +30,7 @@ class SimInMeep():
         sim = mp.Simulation(
             cell_size=self.cell_size,
             boundary_layers=pml_layer,
-            geometry=self.geometry,
+            geometry=self.geomConversion(),
             sources=[source],
             resolution=self.resolution
         )
@@ -77,3 +62,6 @@ class SimInMeep():
 
         return self.eps_data, self.ez_dft
 
+
+
+# Note -> no need of this, has to remove

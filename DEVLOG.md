@@ -108,3 +108,6 @@ Working for HackJNU website
 
 # 2nd January
 - Finally functionable Contour level slider + toggle for normalization
+
+# 3rd - 5th January
+- Adding CAD logic files (scene, primitves, mesh etc.) first then connect them later

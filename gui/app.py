@@ -1,17 +1,15 @@
 import streamlit as st
 import sys
 from pathlib import Path
-import meep as mp
-import numpy as np
 import matplotlib.pyplot as plt
+import core.geometry
+import core.importer
 
-from core.sim_in_meep import SimInMeep
-from core.geometry.geometry_factory import build_geometry
+# from core.solver.base import BaseSolver
+from core.geometry.geometry_decider import build_geometry
 from core.visualization.simulationData import SimulationData
 from core.solver.meep_solver import MeepSolver
 from core.visualization.plotly.base import PlotlyPlotter
-
-
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -57,7 +55,7 @@ st.header("Geometry")
 
 geometry_type = st.radio(
     "Select Geometry Type",
-    ["None", "Import File", "Luneberg Lens"]
+    ["None", "Import", "Luneburg Lens"]
 )
 
 geometry_path = None
@@ -67,7 +65,7 @@ eps = None
 geometry = [] 
 params = {}
 
-if geometry_type == "Import File":
+if geometry_type == "Import":
     geometry_path = st.file_uploader(
         "Upload Geometry File",
         type=["stl", "obj", "ply"]
@@ -84,7 +82,7 @@ if geometry_type == "Import File":
 
     
 
-elif geometry_type == "Luneberg Lens":
+elif geometry_type == "Luneburg Lens":
     radius = st.number_input("Radius", value=3)
     layers = st.number_input("Layers", value=6)
 
@@ -135,19 +133,19 @@ if run:
 
     # ----------------- Simulation -----------------
 
-    sim = SimInMeep(
-        cell_size=mp.Vector3(cell_x, cell_y, cell_z),
+    solver = MeepSolver(
+        cell_size=(cell_x, cell_y, cell_z),
         resolution=resolution,
         pml=pml,
-        source_center=mp.Vector3(src_x, src_y, src_z),
-        source_size=mp.Vector3(src_lx, src_ly, src_lz),
+        source_center=(src_x, src_y, src_z),
+        source_size=(src_lx, src_ly, src_lz),
         frequency=freq,
         geometry=geometry,
         time=sim_time
     )
 
-    # eps, ez = sim.sim_run()
-    solver = MeepSolver(sim)
+
+    # solver = MeepSolver(sim)
     eps, ez = solver.run()
 
     st.session_state.simulation_done = True

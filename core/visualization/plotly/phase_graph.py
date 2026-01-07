@@ -16,9 +16,9 @@ class PhaseGraphPlotter:
 
     def origin_xy(self):
         if self.is_3D:
-            z_slice = self.phase[:, :, self.center]
+            z_slice = self.phase[:, :, self.center].T
         else:
-            z_slice = self.phase
+            z_slice = self.phase.T
 
         fig = go.Figure(
             go.Heatmap(
@@ -48,7 +48,7 @@ class PhaseGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.phase[:, :, self.coords[2]],
+                z=self.phase[:, :, self.coords[2]].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Blues",
@@ -74,7 +74,7 @@ class PhaseGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.phase[self.center, :, :],
+                z=self.phase[self.center, :, :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Blues",
@@ -100,7 +100,7 @@ class PhaseGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.phase[self.coords[0], :, :],
+                z=self.phase[self.coords[0], :, :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Blues",
@@ -126,7 +126,7 @@ class PhaseGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.phase[:, self.center, :],
+                z=self.phase[:, self.center, :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Blues",
@@ -152,7 +152,7 @@ class PhaseGraphPlotter:
 
         fig = go.Figure(
             go.Heatmap(
-                z=self.phase[:, self.coords[1], :],
+                z=self.phase[:, self.coords[1], :].T,
                 x=self.axis,
                 y=self.axis,
                 colorscale="Blues",

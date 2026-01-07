@@ -1,13 +1,17 @@
-import meep as mp
 import numpy as np
+from core.geometry.geometry_builder import GeometryBuilder
+from core.geometry.registry import register_geometry
+from .primitives.sphere import Sphere
+from .primitives.cylinder import Cylinder
 
-class Geometry():
+@register_geometry("Luneburg Lens")
+class LuneburgLens(GeometryBuilder):
     def __init__(self, radius, layers, cell_z):
         self.radius = radius
         self.layers = layers
         self.cell_z = cell_z
 
-    def luneburg_lens(self):
+    def build(self):
         geometry = []
         radii = np.linspace(self.radius / self.layers, self.radius, self.layers)
 
@@ -16,10 +20,10 @@ class Geometry():
             for r in radii[::-1]:
                 eps = 2 - (r / self.radius) ** 2
                 geometry.append(
-                    mp.Sphere(
+                    Sphere(
                         radius=r,
-                        center=mp.Vector3(),
-                        material=mp.Medium(epsilon=eps)
+                        center=(0, 0, 0),
+                        epsilon=eps
                     )
                 )
 
@@ -28,11 +32,11 @@ class Geometry():
             for r in radii[::-1]:
                 eps = 2 - (r / self.radius) ** 2
                 geometry.append(
-                    mp.Cylinder(
+                    Cylinder(
                         radius=r,
                         height=self.cell_z,
-                        center=mp.Vector3(),
-                        material=mp.Medium(epsilon=eps)
+                        center=(0, 0, 0),
+                        epsilon=eps
                     )
                 )
 
