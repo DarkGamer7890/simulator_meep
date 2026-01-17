@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 class GeometryPrimitive(ABC):
-    def __init__(self, center, epsilon):
+    def __init__(self, epsilon, center=(0,0,0)):
         self.epsilon = epsilon
         self.center = np.array(center)
 
@@ -17,10 +17,14 @@ class GeometryPrimitive(ABC):
     @abstractmethod
     def to_plot(self):
         pass
-    
+
     def apply_transform(self, transform):
         print("transform called")
         tx, ty, tz = np.array(transform.translation)
         self.center[0] += tx
         self.center[1] += ty
         self.center[2] += tz
+
+    @abstractmethod
+    def bounding_volume(self) -> float:
+        pass

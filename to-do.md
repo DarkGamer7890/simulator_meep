@@ -1,1 +1,9 @@
-1. check CADNode's to_geometry function
+- check CADNode's to_geometry function
+- change to_plot of CADBlock and CADPrism to add parameters like e1, e2, sideangle if needed
+- remove 'w' and 's' callback in pyvista
+- see if drag to select object can be changed to click
+- .rebuild() clear all geometries and rebuilds -> find a way to rebuild only selected node
+- has to press x,y,z,a,b,c 2 times to move an object
+- when gui is finished, we will work to rebuild only selected nodes
+- rotation not working + keyboard movements not refreshes panel
+- add undo/redo

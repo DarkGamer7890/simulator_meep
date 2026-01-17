@@ -1,11 +1,21 @@
 import sys
 from pathlib import Path
 
+# add project root to PYTHONPATH
 ROOT = Path(__file__).resolve().parent
-sys.path.append(str(ROOT))
+sys.path.insert(0, str(ROOT))
 
-import streamlit.web.cli as stcli
-import sys
+from gui.app import MainWindow
+from PySide6.QtWidgets import QApplication
 
-sys.argv = ["streamlit", "run", "gui/app.py"]
-sys.exit(stcli.main())
+def main():
+    app = QApplication(sys.argv)
+    win = MainWindow()
+    win.show()
+    win.plotter.render()
+    sys.exit(app.exec())
+
+
+
+if __name__ == "__main__":
+    main()

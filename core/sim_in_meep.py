@@ -1,3 +1,5 @@
+# Note -> no need of this, has to remove
+
 import meep as mp
 import numpy as np
 from .geometry.primitives.sphere import Sphere
@@ -64,4 +66,4 @@ class SimInMeep():
 
 
 
-# Note -> no need of this, has to remove
+

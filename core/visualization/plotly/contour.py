@@ -26,6 +26,10 @@ class ContourPlotter:
         levels = kwargs.get("contour_levels", None)
         norm = kwargs.get("normalize", None)
 
+        colorbar_title = "|Ez|"
+        ticks = None
+        ticktext = None
+
         if levels is not None:
             denominator = (levels - 1)
 
@@ -81,6 +85,10 @@ class ContourPlotter:
         
         levels = kwargs.get("contour_levels", None)
         norm = kwargs.get("normalize", None)
+
+        colorbar_title = "|Ez|"
+        ticks = None
+        ticktext = None
 
         if levels is not None:
             denominator = (levels - 1)
@@ -138,6 +146,10 @@ class ContourPlotter:
         levels = kwargs.get("contour_levels", None)
         norm = kwargs.get("normalize", None)
 
+        colorbar_title = "|Ez|"
+        ticks = None
+        ticktext = None
+
         if levels is not None:
             denominator = (levels - 1)
 
@@ -193,6 +205,10 @@ class ContourPlotter:
         
         levels = kwargs.get("contour_levels", None)
         norm = kwargs.get("normalize", None)
+
+        colorbar_title = "|Ez|"
+        ticks = None
+        ticktext = None
 
         if levels is not None:
             denominator = (levels - 1)
@@ -250,6 +266,10 @@ class ContourPlotter:
         levels = kwargs.get("contour_levels", None)
         norm = kwargs.get("normalize", None)
 
+        colorbar_title = "|Ez|"
+        ticks = None
+        ticktext = None
+
         if levels is not None:
             denominator = (levels - 1)
 
@@ -305,6 +325,10 @@ class ContourPlotter:
 
         levels = kwargs.get("contour_levels", None)
         norm = kwargs.get("normalize", None)
+
+        colorbar_title = "|Ez|"
+        ticks = None
+        ticktext = None
 
         if levels is not None:
             denominator = (levels - 1)

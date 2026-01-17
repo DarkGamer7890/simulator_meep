@@ -1,18 +1,22 @@
-import meep as mp
 import numpy as np
 from .base import BaseSolver
-from ..geometry.primitives.sphere import Sphere
-from ..geometry.primitives.cylinder import Cylinder
-from ..geometry.primitives.block import Block
+from ..geometry.primitives import *
+
 
 class MeepSolver(BaseSolver):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
     def build_geometry(self):
-        return [obj.to_meep() for obj in self.geometry]
+        def volume_key(obj):
+            return obj.bounding_volume()   
+        objs = sorted(self.geometry, key=volume_key, reverse=True)
+        return [obj.to_meep() for obj in objs]
+
     
     def run(self):
+        import meep as mp
+
         pml_layer = [mp.PML(self.pml)]
         
         source = mp.Source(

@@ -1,4 +1,3 @@
-import meep as mp
 from core.geometry.primitives.base import GeometryPrimitive
 
 class GeometryMesh(GeometryPrimitive):
@@ -8,7 +7,11 @@ class GeometryMesh(GeometryPrimitive):
         self.mesh = mesh
         self.pitch = pitch  
 
+
+
     def to_meep(self):
+        import meep as mp
+
         """
         Convert mesh into Meep geometry via voxelization
         """
@@ -36,12 +39,18 @@ class GeometryMesh(GeometryPrimitive):
         return geometry
 
 
+
     def to_mesh(self):
         return self.mesh
 
+
+
     def to_plot(self):
-        return self.mesh
-    
+        import pyvista as pv
+        return pv.wrap(self.mesh)
+
+
+
     def apply_transform(self, transform):
         # move center
         print('mesh transform called')
@@ -51,3 +60,7 @@ class GeometryMesh(GeometryPrimitive):
         M = transform.matrix()
         self.mesh = self.mesh.copy()
         self.mesh.apply_transform(M)
+
+    def bounding_volume(self):
+        dx, dy, dz = self.mesh.bounding_box.extents
+        return dx * dy * dz

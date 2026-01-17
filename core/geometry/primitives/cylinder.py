@@ -1,4 +1,3 @@
-import meep as mp
 from .base import GeometryPrimitive
 
 class Cylinder(GeometryPrimitive):
@@ -9,6 +8,7 @@ class Cylinder(GeometryPrimitive):
         self.axis = axis
 
     def to_meep(self):
+        import meep as mp
         return mp.Cylinder(
             radius=self.radius,
             center = mp.Vector3(*self.center),
@@ -21,4 +21,22 @@ class Cylinder(GeometryPrimitive):
         return NotImplementedError
     
     def to_plot(self):
-        return NotImplementedError
+        import pyvista as pv
+        import numpy as np
+
+        direction = np.array(self.axis, dtype=float)
+        direction = direction / np.linalg.norm(direction)
+
+        return pv.Cylinder(
+            center=self.center,
+            direction=direction,
+            radius=self.radius,
+            height=self.height
+        )
+    
+    def bounding_volume(self):
+        import numpy as np
+
+        r = self.radius
+        h = self.height
+        return np.pi * r**2 * h

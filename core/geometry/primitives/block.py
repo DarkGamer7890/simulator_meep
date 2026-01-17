@@ -1,4 +1,3 @@
-import meep as mp
 from .base import GeometryPrimitive
 
 class Block(GeometryPrimitive):
@@ -10,6 +9,7 @@ class Block(GeometryPrimitive):
         self.e3=e3
 
     def to_meep(self):
+        import meep as mp
         return mp.Block(
             size=mp.Vector3(*self.size),
             e1=self.e1,
@@ -23,4 +23,17 @@ class Block(GeometryPrimitive):
         return NotImplementedError
     
     def to_plot(self):
-        return NotImplementedError
+        import pyvista as pv
+        sx, sy, sz = self.size
+
+        return pv.Box(
+            bounds=(
+                self.center[0] - sx/2, self.center[0] + sx/2,
+                self.center[1] - sy/2, self.center[1] + sy/2,
+                self.center[2] - sz/2, self.center[2] + sz/2,
+            )
+        )
+    
+    def bounding_volume(self):
+        sx, sy, sz = self.size  
+        return sx * sy * sz
