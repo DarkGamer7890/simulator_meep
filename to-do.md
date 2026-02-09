@@ -7,3 +7,13 @@
 - when gui is finished, we will work to rebuild only selected nodes
 - rotation not working + keyboard movements not refreshes panel
 - add undo/redo
+
+# simulation 
+- Replace blocking multiprocessing call with:
+  - QTimer polling OR
+  - multiprocessing + signals
+- Add progress reporting
+- Add cancel button
+
+
+- hierarchy panel is not selecting nodes on viewer

@@ -71,3 +71,10 @@ class Transform:
 
     def scale_by(self, sx, sy, sz):
         self.scale *= np.array([sx, sy, sz])
+
+    def clone(self):
+        return Transform(
+            translation=self.translation.copy(),
+            rotation=self.rotation.copy(),
+            scale=self.scale.copy()
+        )

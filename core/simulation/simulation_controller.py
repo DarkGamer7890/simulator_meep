@@ -8,7 +8,7 @@ class SimulationController:
     def __init__(self, cad_builder: CADBuilder):
         self.cad_builder = cad_builder
 
-    def run(self, config: SimulationConfig) -> SimulationData:
+    def run_simulation(self, config: SimulationConfig) -> SimulationData:
         raw_geometry = self.cad_builder.build()
         geometry = []
 

@@ -20,5 +20,7 @@ class CADPrimitive(ABC):
             raise AttributeError(f"No property {name}")
         setattr(self, name, value)
 
-    
+    def clone(self):
+       import copy  
+       return copy.deepcopy(self)
 

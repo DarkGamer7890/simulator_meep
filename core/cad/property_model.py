@@ -16,8 +16,8 @@ class PropertyModel:
             return {}
 
         t = self.node.transform
-        return {
-            **self.node.cad_primitive.get_properties(),
+        props = {
+            # **self.node.cad_primitive.get_properties(),
 
             "pos_x": float(t.translation[0]),
             "pos_y": float(t.translation[1]),
@@ -27,6 +27,11 @@ class PropertyModel:
             "rot_y": float(t.rotation[1]),
             "rot_z": float(t.rotation[2]),
         }
+
+        if self.node.cad_primitive is not None:
+            props.update(self.node.cad_primitive.get_properties())
+
+        return props
 
     
     def set_property(self, name, value):
@@ -55,4 +60,5 @@ class PropertyModel:
     
         # ---- CAD PRIMITIVE PROPERTIES ----
         else:
-            node.cad_primitive.set_property(name, value)
+            if node.cad_primitive is not None:
+                node.cad_primitive.set_property(name, value)

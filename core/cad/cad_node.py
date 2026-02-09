@@ -56,3 +56,16 @@ class CADNode:
             )
 
         return geometries
+
+    def clone_recursive(self):
+        new_node = CADNode(
+            name=f"{self.name}_copy",
+            cad_primitive=self.cad_primitive.clone() if self.cad_primitive else None,
+            transform=self.transform.clone()
+        )
+
+        for child in self.children:
+            new_child = child.clone_recursive()
+            new_node.add_child(new_child)
+
+        return new_node

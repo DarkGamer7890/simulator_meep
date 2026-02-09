@@ -13,6 +13,7 @@ class CADController:
     def __init__(self, builder, viewer):
         self.builder = builder
         self.viewer = viewer
+        self.selected_node = None
 
         self.property_model = PropertyModel()
 
@@ -31,6 +32,10 @@ class CADController:
     def rebuild(self):
         geometries = self.builder.build()
         self.viewer.show_geometry(geometries)
+
+        if hasattr(self, "hierarchy_panel"):
+            self.hierarchy_panel.rebuild()
+
 
 
 
@@ -83,34 +88,106 @@ class CADController:
 
 
     def delete_selected(self):
-        node = self.viewer.selected_node
+        node = self.selected_node
         if node is None:
             return
+        
+        # Don't delete the root node
+        if node == self.builder.root_node:
+            print("Cannot delete root node")
+            return
 
-        parent = self.builder.root_node
-        parent.children = [c for c in parent.children if c is not node]
 
-        self.viewer.deselect_all()
+        for parent in self.builder.root_node.flatten():
+            if node in parent.children:
+                parent.children.remove(node)
+                break
+
+        self.selected_node = None
+        self.viewer.highlight_node(None)
+
+        if hasattr(self, 'hierarchy_panel'):
+            self.hierarchy_panel.select_node(None)
+
+        if hasattr(self, 'properties_panel'):
+            self.properties_panel.clear()
+
+        # self.viewer.deselect_all()
         self.rebuild()
 
 
 
     def on_move_requested(self, node, delta):
+        if node is not self.selected_node:
+            return
+        
         import numpy as np
         node.transform.translation += np.array(delta)
         self.rebuild()
 
 
 
-    def on_node_selected(self, node:CADNode):
+    def on_node_selected(self, node, source=None):
+        """Handle node selection from any source (viewer, hierarchy, etc.)"""
+        # Guard against re-selecting the same node
+        if self.selected_node is node:
+            return
+
+        self.selected_node = node
+
         if node is None:
-            return 
-        self.property_model.set_node(node)
-        print(node.cad_primitive.get_properties())
-        print(self.property_model.get_properties())
+            self.property_model.clear()
+        else:
+            self.property_model.set_node(node)
+
+        # Update viewer highlight (NO callbacks)
+        self.viewer.highlight_node(node)
+
+        # Update hierarchy selection (NO callbacks)
+        if hasattr(self, 'hierarchy_panel'):
+            self.hierarchy_panel.select_node(node)
+
+
+        # Update properties panel
+        if hasattr(self, 'properties_panel'):
+            if node is None:
+                self.properties_panel.clear()
+            else:
+                self.properties_panel.refresh()
+
 
 
 
     def update_property(self, node: CADNode, prop: str, value):
         self.property_model.set_property(prop, value)
+        self.rebuild()
+
+
+
+    def add_child(self, parent):
+        # temporarily added sphere
+        child = CADNode(
+            name="Child",
+            cad_primitive=CADSphere(radius=0.5, epsilon=1.0),
+            transform=Transform()
+        )
+        parent.add_child(child)
+        self.rebuild()
+
+
+
+    def duplicate_node(self, node):
+        if node is None:
+            return
+
+        # find parent
+        parent = self.builder.root_node
+        for n in self.builder.root_node.flatten():
+            if node in n.children:
+                parent = n
+                break
+
+        duplicated = node.clone_recursive()
+
+        parent.add_child(duplicated)
         self.rebuild()

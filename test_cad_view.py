@@ -1,34 +1,22 @@
 import os
-
-# Force X11, NOT Wayland
 os.environ["QT_QPA_PLATFORM"] = "xcb"
-
-# Disable GPU for QWebEngine
 os.environ["QTWEBENGINE_DISABLE_GPU"] = "1"
 os.environ["QTWEBENGINE_CHROMIUM_FLAGS"] = "--disable-gpu --disable-software-rasterizer"
-
-# Avoid shared GL context crashes
 os.environ["QT_OPENGL"] = "software"
-
-
 
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QSplitter, QDockWidget
 from PyQt5.QtCore import Qt
-# from PyQt5.QtWebEngineWidgets import QWebEngineView
 
 from core.cad.cad_scene import CADScene
-# from core.cad.cad_node import CADNode
 from core.cad.cad_builder import CADBuilder
 from core.cad.cad_primitives import *
-# from core.cad.transform import Transform
 from core.cad.cad_controller import CADController
 from gui.properties.property_panel import PropertyPanel
 from gui.viewer import PyVistaViewer
-# from core.simulation.simulation_controller import SimulationController
 from gui.simulation.simulation_panel import SimulationPanel
 from gui.app_controller import AppController
-# from gui.plots.plot_panel import PlotPanel
+from gui.hierarchy.hierarchy_panel import HierarchyPanel
 
 # Create scene
 scene = CADScene()
@@ -36,8 +24,6 @@ builder = CADBuilder(scene.root)
 
 # Create QApplication
 app = QApplication(sys.argv)
-
-# Set application attributes for better compatibility
 app.setAttribute(Qt.AA_ShareOpenGLContexts, True)
 
 # Create main window
@@ -56,37 +42,30 @@ viewer.setMinimumWidth(800)
 # Create controller
 controller = CADController(builder=builder, viewer=viewer)
 
-# Create property panel
+# Create panels
 property_panel = PropertyPanel(controller=controller, model=controller.property_model)
+hierarchy_panel = HierarchyPanel(controller, viewer)
+
+# Connect panels to controller
+controller.hierarchy_panel = hierarchy_panel
+controller.properties_panel = property_panel
+
+# Rebuild hierarchy
+hierarchy_panel.rebuild()
 
 # Create app controller
 app_controller = AppController(builder)
 
-# Create plot panel as a dock widget
-# plot_dock = QDockWidget("Plots", main_window)
-# plot_panel = PlotPanel()
-# plot_dock.setWidget(plot_panel)
-# plot_dock.setMinimumHeight(200)
-
-# Create simulation panel (NOT as dock widget, just in splitter)
+# Create simulation panel
 sim_panel = SimulationPanel(app_controller)
-# sim_panel = SimulationPanel(app_controller, plot_panel)
-
-# Connect viewer selection to property panel
-def on_selection_changed(node):
-    print(f"Selection changed to: {node}")
-    controller.property_model.node = node
-    property_panel.refresh()
-
-viewer.signals.selection_changed.connect(on_selection_changed)
 
 # Create right side splitter with both panels
 right_splitter = QSplitter(Qt.Vertical)
+right_splitter.addWidget(hierarchy_panel)
 right_splitter.addWidget(property_panel)
 right_splitter.addWidget(sim_panel)
 right_splitter.setMinimumWidth(250)
 right_splitter.setMaximumWidth(350)
-right_splitter.setSizes([400, 200])
 
 # Add widgets to main layout
 main_layout.addWidget(viewer, stretch=3)
