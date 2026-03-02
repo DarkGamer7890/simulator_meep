@@ -14,6 +14,8 @@ class CADController:
         self.builder = builder
         self.viewer = viewer
         self.selected_node = None
+        self.transform_mode = "translate"  # translate | rotate
+        self.axis_mode = "local"           # local | world
 
         self.property_model = PropertyModel()
 
@@ -118,12 +120,18 @@ class CADController:
 
 
     def on_move_requested(self, node, delta):
+        import numpy as np
+
         if node is not self.selected_node:
             return
+
+        dx, dy, dz = delta
         
-        import numpy as np
-        node.transform.translation += np.array(delta)
+        node.transform.translation[0] += dx  
+        node.transform.translation[1] += dy  
+        node.transform.translation[2] += dz 
         self.rebuild()
+
 
 
 
@@ -142,6 +150,8 @@ class CADController:
 
         # Update viewer highlight (NO callbacks)
         self.viewer.highlight_node(node)
+
+        print(self.property_model.get_properties())
 
         # Update hierarchy selection (NO callbacks)
         if hasattr(self, 'hierarchy_panel'):

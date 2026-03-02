@@ -14,6 +14,8 @@ class PropertyModel:
     def get_properties(self):
         if self.node is None:
             return {}
+        
+        import numpy as np
 
         t = self.node.transform
         props = {
@@ -23,10 +25,11 @@ class PropertyModel:
             "pos_y": float(t.translation[1]),
             "pos_z": float(t.translation[2]),
 
-            "rot_x": float(t.rotation[0]),
-            "rot_y": float(t.rotation[1]),
-            "rot_z": float(t.rotation[2]),
+            "rot_x": np.degrees(t.rotation[0]),
+            "rot_y": np.degrees(t.rotation[1]),
+            "rot_z": np.degrees(t.rotation[2]),
         }
+
 
         if self.node.cad_primitive is not None:
             props.update(self.node.cad_primitive.get_properties())
@@ -39,6 +42,7 @@ class PropertyModel:
         if not node:
             return
     
+        import numpy as np
         
         transform = node.transform
     
@@ -52,11 +56,11 @@ class PropertyModel:
     
         # ---- ROTATION (Euler XYZ, radians) ----
         elif name == "rot_x":
-            transform.rotation[0] = value
+            transform.rotation[0] = np.radians(value)
         elif name == "rot_y":
-            transform.rotation[1] = value
+            transform.rotation[1] = np.radians(value)
         elif name == "rot_z":
-            transform.rotation[2] = value
+            transform.rotation[2] = np.radians(value)
     
         # ---- CAD PRIMITIVE PROPERTIES ----
         else:

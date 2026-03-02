@@ -52,22 +52,22 @@ class PyVistaViewer(QtInteractor):
         self.node_to_actor.clear()  # ADD THIS
 
     def show_geometry(self, geometries):
-        # Save camera position before clearing
         saved_camera_position = None
         if self.geometry_actors:
             saved_camera_position = self.camera_position
-        
-        # Keep track of which node was selected to re-select it
+
         previously_selected_node = self.selected_node
-        
+
         self.clear()
-        
-        for node, geom in geometries:
+
+        for node, geom, world_transform in geometries:
             mesh = geom.to_plot()
             if mesh is None:
                 continue
             
             pv_mesh = pv.wrap(mesh)
+            pv_mesh.translate(-geom.center, inplace=True) 
+            
             actor = self.add_mesh(
                 pv_mesh,
                 color="lightblue",
@@ -77,28 +77,29 @@ class PyVistaViewer(QtInteractor):
                 pickable=True,
                 reset_camera=False
             )
-            
-            self._apply_transform_to_actor(actor, node.transform)
-            
+
+            # Apply rotation AROUND the geometry center
+            self._apply_transform_to_actor(actor, world_transform)
+
             self.geometry_actors.append(actor)
             self.actor_to_node[actor] = node
-            self.node_to_actor[node] = actor  # ADD THIS
-            
-            # Re-select the previously selected node
+            self.node_to_actor[node] = actor
+
             if previously_selected_node is not None and node is previously_selected_node:
                 self.selected_actor = actor
                 self.selected_node = node
                 actor.GetProperty().SetColor(1.0, 0.2, 0.2)
                 actor.GetProperty().SetOpacity(0.8)
-        
-        # Handle camera positioning
+
         if self.geometry_actors:
             if saved_camera_position is None:
                 self.reset_camera(bounds=self._get_geometry_bounds())
             else:
                 self.camera_position = saved_camera_position
-        
+
         self.render()
+
+        
 
     def _get_geometry_bounds(self):
         if not self.geometry_actors:
@@ -281,7 +282,7 @@ class PyVistaViewer(QtInteractor):
     # -------------------------------------------------
     
     def _apply_transform_to_actor(self, actor, transform):
-        M = transform.matrix()  # 4x4 numpy
+        M = transform.matrix()
         vtk_t = vtk.vtkTransform()
         vtk_t.SetMatrix(M.flatten())
         actor.SetUserTransform(vtk_t)

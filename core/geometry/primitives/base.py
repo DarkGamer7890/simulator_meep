@@ -19,11 +19,22 @@ class GeometryPrimitive(ABC):
         pass
 
     def apply_transform(self, transform):
-        print("transform called")
-        tx, ty, tz = np.array(transform.translation)
-        self.center[0] += tx
-        self.center[1] += ty
-        self.center[2] += tz
+        # # Apply translation to center (world space)
+        # self.center = np.array(self.center) + np.array(transform.translation)
+        
+        # # Store rotation for reference (will be applied by VTK actor)
+        # if not hasattr(self, 'rotation'):
+        #     self.rotation = transform.rotation
+        
+        # # Store the world transform (will be used by viewer)
+        # self.world_transform = transform
+        
+        # # Apply scale
+        # if hasattr(self, 'radius'):
+        #     self.radius *= transform.scale[0]
+        # if hasattr(self, 'size'):
+        #     self.size = tuple(s * scale for s, scale in zip(self.size, transform.scale))
+        pass
 
     @abstractmethod
     def bounding_volume(self) -> float:

@@ -32,30 +32,83 @@ class CADNode:
 
 
 
-    def to_geometry(          
-        self,
-        parent_transform: Optional[Transform] = None
-    ) -> List[Tuple["CADNode", GeometryPrimitive]]:
+    # def to_geometry(          
+    #     self,
+    #     parent_transform: Optional[Transform] = None
+    # ) -> List[Tuple["CADNode", GeometryPrimitive]]:
+        
+    #     # --- WORLD translation ---
+    #     if parent_transform is None:
+    #         world_translation = self.transform.translation.copy()
+    #         world_rotation = self.transform.rotation.copy()
+    #     else:
+    #         world_translation = (
+    #             parent_transform.translation + self.transform.translation
+    #         )
+    #         world_rotation = (
+    #             parent_transform.rotation + self.transform.rotation
+    #         )
+    
+    #     # build a NEW transform (NO matrices)
+    #     current = Transform(
+    #         translation=world_translation,
+    #         rotation=world_rotation,
+    #         scale=self.transform.scale
+    #     )
+    
+    #     geometries = []
+    
+    #     if self.cad_primitive is not None:
+    #         geom_list = self.cad_primitive.to_geometry()
+    #         for geom in geom_list:
+    #             geom.apply_transform(current)
+    #             geometries.append((self, geom))
+    
+    #     for child in self.children:
+    #         geometries.extend(
+    #             child.to_geometry(current)
+    #         )
+    
+    #     return geometries
 
-        current = self.transform
-        if parent_transform is not None:
-            current = parent_transform @ self.transform
 
-        geometries: List[Tuple["CADNode", GeometryPrimitive]] = []
+
+
+    def to_geometry(self, parent_transform: Optional[Transform] = None) -> List[Tuple["CADNode", GeometryPrimitive, Transform]]:
+
+        import numpy as np
+
+        if parent_transform is None:
+            world_translation = self.transform.translation.copy()
+            world_rotation = self.transform.rotation.copy()
+        else:
+            world_translation = parent_transform.translation + self.transform.translation
+            world_rotation = parent_transform.rotation + self.transform.rotation
+
+        geometries = []
 
         if self.cad_primitive is not None:
             geom_list = self.cad_primitive.to_geometry()
-
             for geom in geom_list:
-                geom.apply_transform(current)
-                geometries.append((self, geom))
+                full_world_transform = Transform(
+                    translation=world_translation,
+                    rotation=world_rotation,
+                    scale=self.transform.scale
+                )
+                geometries.append((self, geom, full_world_transform))
 
         for child in self.children:
-            geometries.extend(
-                child.to_geometry(current)
+            world_transform = Transform(
+                translation=world_translation,
+                rotation=world_rotation,
+                scale=self.transform.scale
             )
+            geometries.extend(child.to_geometry(world_transform))
 
         return geometries
+
+
+
 
     def clone_recursive(self):
         new_node = CADNode(
