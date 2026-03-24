@@ -1,0 +1,51 @@
+{
+    "type": "cad",
+    "name": "root",
+    "transform": {
+        "translation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "rotation": [
+            0.0,
+            0.0,
+            0.0
+        ],
+        "scale": [
+            1.0,
+            1.0,
+            1.0
+        ]
+    },
+    "primitive": null,
+    "children": [
+        {
+            "type": "cad",
+            "name": "Sphere",
+            "transform": {
+                "translation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "rotation": [
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                "scale": [
+                    1.0,
+                    1.0,
+                    1.0
+                ]
+            },
+            "primitive": {
+                "type": "Sphere",
+                "radius": 1.0,
+                "epsilon": 1.0
+            },
+            "children": []
+        }
+    ]
+}

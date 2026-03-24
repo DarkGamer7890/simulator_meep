@@ -36,4 +36,12 @@ class CADBlock(CADPrimitive):
             self.epsilon = value
         else:
             raise AttributeError(f"No property {name}")
+        
+
+    def to_dict(self):
+        return {
+            "type": "block",
+            "size": list(self.size),
+            "epsilon": float(self.epsilon)
+        }
 

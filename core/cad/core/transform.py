@@ -66,12 +66,6 @@ class Transform:
 
 
     def combined_with(self, parent: "Transform") -> "Transform":
-        """
-        World-space composition:
-        - translation: world additive
-        - rotation: local additive (Euler)
-        - scale: multiplicative
-        """
         return Transform(
             translation=parent.translation + self.translation,
             rotation=parent.rotation + self.rotation,
@@ -81,12 +75,12 @@ class Transform:
     
 
 
-    def local_axes(self):
-        R = self.matrix()[:3, :3]   # rotation+scale
-        x = R[:, 0]
-        y = R[:, 1]
-        z = R[:, 2]
-        return x, y, z
+    # def local_axes(self):
+    #     R = self.matrix()[:3, :3]   # rotation+scale
+    #     x = R[:, 0]
+    #     y = R[:, 1]
+    #     z = R[:, 2]
+    #     return x, y, z
 
 
     

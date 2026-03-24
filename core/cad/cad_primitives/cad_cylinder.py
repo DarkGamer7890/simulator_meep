@@ -27,3 +27,11 @@ class CADCylinder(CADPrimitive):
             "height": self.height,
             "epsilon": self.epsilon,
         }
+    
+    def to_dict(self):
+        return {
+            "type": "Cylinder",
+            "radius": float(self.radius),
+            "height": float(self.height),
+            "epsilon": float(self.epsilon),
+        }

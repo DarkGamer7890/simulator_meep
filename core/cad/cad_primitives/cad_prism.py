@@ -27,4 +27,12 @@ class CADPrism(CADPrimitive):
             "epsilon": self.epsilon,
             "num_vertices": len(self.vertices),
         }
+    
+    def to_dict(self):
+        return {
+            "type": "prism",
+            "height": float(self.height),
+            "epsilon": float(self.epsilon),
+            "num_vertices": len(self.vertices),
+        }
 

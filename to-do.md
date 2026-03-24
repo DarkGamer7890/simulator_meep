@@ -28,3 +28,7 @@
 - Add progress reporting
 
 - Add cancel button
+
+- On moving object with x,y,z,a,b,c update property panel also
+
+- On moving parent, child should remain at same place like before and not move with same step size

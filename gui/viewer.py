@@ -12,6 +12,8 @@ class PyVistaViewerSignals(QObject):
     add_prism_requested = pyqtSignal()
     delete_requested = pyqtSignal()
     selection_changed = pyqtSignal(object)
+    duplicate_node = pyqtSignal(object)
+    save_scene = pyqtSignal(object)
 
 
 class PyVistaViewer(QtInteractor):
@@ -205,6 +207,7 @@ class PyVistaViewer(QtInteractor):
         elif key == Qt.Key_Delete:
             self.signals.delete_requested.emit()
             return
+        
         
         # Deselect
         if key == Qt.Key_R:

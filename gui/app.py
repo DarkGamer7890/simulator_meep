@@ -17,7 +17,7 @@ QApplication.setAttribute(Qt.AA_ShareOpenGLContexts, True)
 app = QApplication(sys.argv)
 app.setFont(QFont("Segoe UI", 9))
 
-from core.cad.cad_scene import CADScene
+from core.cad.core.cad_scene import CADScene
 from core.cad.cad_builder import CADBuilder
 from core.cad.cad_primitives import *
 from core.cad.cad_controller import CADController
@@ -140,7 +140,8 @@ class HomePanel(QWidget):
 
         edit = RibbonSection("Edit")
         edit.add_btn("🗑", "Delete", controller.delete_selected, "Delete selected (Del)")
-        edit.add_btn("⧉", "Duplicate", controller.duplicate_node_selected, "Duplicate selected")
+        edit.add_btn("⧉", "Duplicate", controller.duplicate_node, "Duplicate selected")
+        edit.add_btn("⧉", "Save", controller.save_scene, "Scene Saved")
         layout.addWidget(edit)
 
         layout.addStretch()
@@ -252,12 +253,12 @@ class MainWindow(QMainWindow):
         self.resize(1500, 900)
 
         scene = CADScene()
-        builder = CADBuilder(scene.root)
+        builder = CADBuilder(scene)
         viewer = PyVistaViewer()
         viewer.setMinimumWidth(700)
 
         controller = CADController(builder=builder, viewer=viewer)
-        controller.duplicate_node_selected = lambda: controller.duplicate_node(controller.selected_node)
+        # controller.duplicate_node_selected = lambda: controller.duplicate_node(controller.selected_node)
 
         property_panel = PropertyPanel(controller=controller, model=controller.property_model)
         hierarchy_panel = HierarchyPanel(controller, viewer)

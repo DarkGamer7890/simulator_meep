@@ -8,7 +8,7 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QSplitter, QDockWidget
 from PyQt5.QtCore import Qt
 
-from core.cad.cad_scene import CADScene
+from core.cad.core.cad_scene import CADScene
 from core.cad.cad_builder import CADBuilder
 from core.cad.cad_primitives import *
 from core.cad.cad_controller import CADController

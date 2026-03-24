@@ -39,3 +39,7 @@ class GeometryPrimitive(ABC):
     @abstractmethod
     def bounding_volume(self) -> float:
         pass
+
+    def clone(self):
+       import copy  
+       return copy.deepcopy(self)

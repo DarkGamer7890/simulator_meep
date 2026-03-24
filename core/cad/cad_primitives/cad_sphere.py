@@ -23,3 +23,11 @@ class CADSphere(CADPrimitive):
             "radius": self.radius,
             "epsilon": self.epsilon,
         }
+    
+    def to_dict(self):
+        return {
+            "type": "Sphere",
+            "radius": float(self.radius),
+            "epsilon": float(self.epsilon),
+        }
+    

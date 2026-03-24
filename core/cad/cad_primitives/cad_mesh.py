@@ -23,4 +23,8 @@ class CADMesh(CADPrimitive):   # removed offset
     
     def get_properties(self):
         raise NotImplementedError
+    
+
+    def to_dict(self):
+        raise NotImplementedError
         

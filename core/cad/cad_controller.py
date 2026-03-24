@@ -1,10 +1,7 @@
-from .cad_node import CADNode
-from .transform import Transform
-from .cad_primitives.cad_sphere import CADSphere
-from .cad_primitives.cad_cylinder import CADCylinder
-from .cad_primitives.cad_block import CADBlock
-from .cad_primitives.cad_prism import CADPrism
-from .property_model import PropertyModel
+from .core.cad_node import CADNode
+from .core.transform import Transform
+from  .cad_primitives import *
+from .core.property_model import PropertyModel
 
 
 
@@ -26,6 +23,8 @@ class CADController:
         self.viewer.signals.add_prism_requested.connect(self.add_prism)
         self.viewer.signals.delete_requested.connect(self.delete_selected)
         self.viewer.signals.selection_changed.connect(self.on_node_selected)
+        self.viewer.signals.duplicate_node.connect(self.duplicate_node)
+        self.viewer.signals.save_scene.connect(self.save_scene)
 
         self.rebuild()
 
@@ -186,18 +185,42 @@ class CADController:
 
 
 
-    def duplicate_node(self, node):
-        if node is None:
+    def duplicate_node(self):
+        if self.selected_node is None:
             return
 
         # find parent
         parent = self.builder.root_node
         for n in self.builder.root_node.flatten():
-            if node in n.children:
+            if self.selected_node in n.children:
                 parent = n
                 break
 
-        duplicated = node.clone_recursive()
+        duplicated = self.selected_node.clone_recursive()
 
         parent.add_child(duplicated)
         self.rebuild()
+
+
+    def save_scene(self):
+        from tkinter import Tk, filedialog
+    
+        root = Tk()
+        root.withdraw()  # hide main tkinter window
+    
+        filepath = filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=[("JSON files", "*.json")],
+            title="Save Scene"
+        )
+    
+        root.destroy()
+    
+        if not filepath:
+            return
+    
+        try:
+            self.builder.scene.save_scene(filepath)
+            print("Saved at:", filepath)
+        except Exception as e:
+            print("Error saving:", e)

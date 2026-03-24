@@ -1,14 +1,26 @@
-from typing import List, Tuple
-from core.geometry.primitives.base import GeometryPrimitive
-from .cad_node import CADNode
-from .transform import Transform
+from core.cad.core.geometry_build_result import GeometryBuildResult
+from .core.cad_scene import CADScene
+from .core.transform import Transform
 from core.geometry.registry import register_geometry
 
 @register_geometry("CAD")
 class CADBuilder:
 
-    def __init__(self, root_node: CADNode):
-        self.root_node = root_node
+    def __init__(self, scene: CADScene):
+        self.scene = scene
+        self.root_node = scene.get_root()
 
-    def build(self) -> List[Tuple[CADNode, GeometryPrimitive, Transform]]:
-        return self.root_node.to_geometry()
+    def build(self):
+        result = self.root_node.to_geometry()
+
+        geometries = []
+
+        # Add additions
+        for node, geom, transform in result.additions:
+            geometries.append((node, geom, transform))
+
+        # Add subtractions (for Meep overwrite behavior)
+        for node, geom, transform in result.subtractions:
+            geometries.append((node, geom, transform))
+
+        return geometries
