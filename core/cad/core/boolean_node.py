@@ -24,7 +24,7 @@ class BooleanNode(CADNode):
     #     if not self.children:
     #         return result
 
-    #     # First child is base
+    #     # first child is base
     #     base_result = self.children[0].to_geometry(world_transform)
 
     #     if self.operation == "union":
@@ -38,7 +38,7 @@ class BooleanNode(CADNode):
     #         result.additions.extend(base_result.additions)
     #         result.subtractions.extend(base_result.subtractions)
 
-    #         # All other children become subtractions
+    #         # all other children become subtractions
     #         for child in self.children[1:]:
     #             child_result = child.to_geometry(world_transform)
 

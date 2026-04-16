@@ -2,8 +2,8 @@ from core.geometry.primitives.base import GeometryPrimitive
 
 class GeometryMesh(GeometryPrimitive):
 
-    def __init__(self, mesh, center, epsilon, pitch=0.1):  #removed offset
-        super().__init__(center, epsilon)  #sending center instead of center = offset
+    def __init__(self, mesh, center, epsilon, pitch=0.1):  
+        super().__init__(center, epsilon)  
         self.mesh = mesh
         self.pitch = pitch  
 
@@ -12,13 +12,10 @@ class GeometryMesh(GeometryPrimitive):
     def to_meep(self):
         import meep as mp
 
-        """
-        Convert mesh into Meep geometry via voxelization
-        """
-        # 1. Voxelize the mesh
+        # 1. voxelize the mesh
         voxelized = self.mesh.voxelized(self.pitch)
 
-        # 2. Get voxel centers
+        # 2. get voxel centers
         points = voxelized.points
 
         geometry = []
@@ -56,7 +53,7 @@ class GeometryMesh(GeometryPrimitive):
         print('mesh transform called')
         super().apply_transform(transform)
 
-        # ALSO move the mesh itself
+        # move the mesh itself
         M = transform.matrix()
         self.mesh = self.mesh.copy()
         self.mesh.apply_transform(M)

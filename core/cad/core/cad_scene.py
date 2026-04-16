@@ -2,6 +2,8 @@ from .cad_node import CADNode
 from .boolean_node import BooleanNode
 from core.cad.cad_primitives.cad_block import CADBlock
 from core.cad.cad_primitives.cad_cylinder import CADCylinder
+from core.cad.cad_primitives.cad_sphere import CADSphere
+from core.cad.cad_primitives.cad_prism import CADPrism
 
 from core.geometry.primitives.base import GeometryPrimitive
 import json
@@ -12,7 +14,7 @@ class CADScene:
     def __init__(self, name: str = "Scene"):
         self.name = name
         self.root = CADNode(name="root")
-        # self.filepath = "/home/darkgamer7/DarkGamer7/WxPython/simulator_pyvista/save/"
+    
 
     def add_primitive(
         self,
@@ -36,14 +38,14 @@ class CADScene:
     def set_root(self, root: CADNode):
         self.root = root
 
-    # ---------------- SAVE ---------------- #
+    # save
 
     def save_scene(self, filepath):
         data = self.root.to_dict()
         with open(filepath, "w") as f:
             json.dump(data, f, indent=4)
 
-    # ---------------- LOAD ---------------- #
+    # load
 
     @staticmethod
     def load_scene(filepath):
@@ -57,7 +59,7 @@ class CADScene:
 
         return scene
 
-    # ---------------- FROM DICT ---------------- #
+    
 
     @staticmethod
     def from_dict(data):
@@ -90,25 +92,42 @@ class CADScene:
 
             return node
 
-    # ---------------- PRIMITIVE FACTORY ---------------- #
+    
 
     @staticmethod
     def primitive_from_dict(data):
 
         if data["type"] == "block":
             return CADBlock(
-                size=tuple(data["size"]),
-                epsilon=data["epsilon"]
+                size=list(data["size"]),
+                epsilon=data["epsilon"],
+                # center=list(data["center"])
             )
 
         elif data["type"] == "cylinder":
             return CADCylinder(
                 radius=data["radius"],
                 height=data["height"],
-                epsilon=data["epsilon"]
+                epsilon=data["epsilon"],
+                axis=list(data["axis"]),
+                # center=list(data["center"]),
             )
-
-        # Add more later (sphere, prism, etc.)
+        
+        elif data["type"] == "sphere":
+            return CADSphere(
+                radius=data["radius"],
+                epsilon=data["epsilon"],
+                # center=list(data["center"]),
+            )
+        
+        elif data["type"] == "prism":
+            return CADPrism(
+                height=data["height"],
+                epsilon=data["epsilon"],
+                vertices=list(data["vertices"]),
+                axis=list(data["axis"]),
+                # center=list(data["center"]),
+            )
 
         else:
             raise ValueError(f"Unknown primitive type: {data['type']}")

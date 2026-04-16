@@ -33,6 +33,8 @@ class CADPrism(CADPrimitive):
             "type": "prism",
             "height": float(self.height),
             "epsilon": float(self.epsilon),
-            "num_vertices": len(self.vertices),
+            "axis": list(self.axis),
+            "vertices": list(self.vertices),
+            "center": list(self.center),
         }
 

@@ -20,7 +20,7 @@ class HierarchyPanel(QWidget):
 
 
     def rebuild(self):
-        """Rebuild tree from CAD scene"""
+        # rebuild tree from CAD scene
         self.tree.clear()
         root = self.controller.builder.root_node
         root_item = self._add_node_recursive(root, None)
@@ -32,10 +32,10 @@ class HierarchyPanel(QWidget):
         item = QTreeWidgetItem([node.name])
         item.setData(0, Qt.UserRole, node)
 
-        # Make root node non-selectable
-        if parent_item is None:  # This is the root
+        # make root node non-selectable
+        if parent_item is None:  # root
             item.setFlags(item.flags() & ~Qt.ItemIsSelectable)
-            item.setForeground(0, Qt.gray)  # Visual indicator
+            item.setForeground(0, Qt.gray)  # visual indicator
         
         if parent_item is None:
             self.tree.addTopLevelItem(item)
@@ -50,16 +50,16 @@ class HierarchyPanel(QWidget):
 
 
     def on_item_clicked(self, item, column):
-        """Handle user clicking on tree item"""
+        # handle user clicking on tree item
         node = item.data(0, Qt.UserRole)
         if node:
             self.controller.on_node_selected(node, source="hierarchy")
+            self.viewer.setFocus()
     
 
     
     def select_node(self, node):
-        """Programmatically select a node in the tree. NO callbacks."""
-        # Block signals to prevent triggering on_item_clicked
+        # block signals to prevent triggering on_item_clicked
         self.tree.blockSignals(True)
         
         if node is None:
@@ -67,15 +67,14 @@ class HierarchyPanel(QWidget):
         else:
             self._select_node_recursive(node)
         
-        # Restore signals
+        # restore signals
         self.tree.blockSignals(False)
     
     def _select_node_recursive(self, node):
-        """Recursively search for and select a node"""
         def recurse(item):
             if item.data(0, Qt.UserRole) is node:
                 self.tree.setCurrentItem(item)
-                self.tree.scrollToItem(item)  # Ensure it's visible
+                self.tree.scrollToItem(item)  # ensure it's visible
                 return True
             
             for i in range(item.childCount()):
@@ -84,7 +83,7 @@ class HierarchyPanel(QWidget):
             
             return False
         
-        # Search through all top-level items
+       
         for i in range(self.tree.topLevelItemCount()):
             if recurse(self.tree.topLevelItem(i)):
                 return

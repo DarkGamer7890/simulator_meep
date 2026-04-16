@@ -46,7 +46,7 @@ class PropertyModel:
         
         transform = node.transform
     
-        # ---- TRANSLATION ----
+
         if name == "pos_x":
             transform.translation[0] = value
         elif name == "pos_y":
@@ -54,7 +54,7 @@ class PropertyModel:
         elif name == "pos_z":
             transform.translation[2] = value
     
-        # ---- ROTATION (Euler XYZ, radians) ----
+
         elif name == "rot_x":
             transform.rotation[0] = np.radians(value)
         elif name == "rot_y":
@@ -62,7 +62,7 @@ class PropertyModel:
         elif name == "rot_z":
             transform.rotation[2] = np.radians(value)
     
-        # ---- CAD PRIMITIVE PROPERTIES ----
+
         else:
             if node.cad_primitive is not None:
                 node.cad_primitive.set_property(name, value)

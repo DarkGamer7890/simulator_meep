@@ -29,5 +29,6 @@ class CADSphere(CADPrimitive):
             "type": "Sphere",
             "radius": float(self.radius),
             "epsilon": float(self.epsilon),
+            "center": list(self.center),
         }
     

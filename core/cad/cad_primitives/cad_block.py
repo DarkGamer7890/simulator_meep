@@ -42,6 +42,7 @@ class CADBlock(CADPrimitive):
         return {
             "type": "block",
             "size": list(self.size),
-            "epsilon": float(self.epsilon)
+            "epsilon": float(self.epsilon),
+            "center": list(self.center),
         }
 

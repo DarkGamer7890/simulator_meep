@@ -12,8 +12,8 @@ class PyVistaViewerSignals(QObject):
     add_prism_requested = pyqtSignal()
     delete_requested = pyqtSignal()
     selection_changed = pyqtSignal(object)
-    duplicate_node = pyqtSignal(object)
-    save_scene = pyqtSignal(object)
+    duplicate_node = pyqtSignal()
+    save_scene = pyqtSignal()
 
 
 class PyVistaViewer(QtInteractor):
@@ -22,6 +22,9 @@ class PyVistaViewer(QtInteractor):
         
         # Create signals object
         self.signals = PyVistaViewerSignals()
+
+        # focus on viewer
+        self.setFocusPolicy(Qt.StrongFocus)
         
         # Scene setup
         self.set_background("white")
@@ -29,7 +32,7 @@ class PyVistaViewer(QtInteractor):
         
         self.geometry_actors = []
         self.actor_to_node = {}
-        self.node_to_actor = {}  # ADD THIS - reverse mapping
+        self.node_to_actor = {}  # reverse mapping
         self.selected_actor = None
         self.selected_node = None
         
@@ -38,20 +41,21 @@ class PyVistaViewer(QtInteractor):
         self.enable_cell_picking(
             callback=self._on_pick,
             show=False,
-            left_clicking=True,  # CHANGED: Enable left click
+            left_clicking=True,  # Enable left click
             through=False
         )
 
-    # -------------------------------------------------
-    # Scene control
-    # -------------------------------------------------
+        self.simulation_running = False
+
+
+    # scene control
     
     def clear(self):
         for actor in self.geometry_actors:
             self.remove_actor(actor)
         self.geometry_actors.clear()
         self.actor_to_node.clear()
-        self.node_to_actor.clear()  # ADD THIS
+        self.node_to_actor.clear() 
 
     def show_geometry(self, geometries):
         saved_camera_position = None
@@ -80,7 +84,6 @@ class PyVistaViewer(QtInteractor):
                 reset_camera=False
             )
 
-            # Apply rotation AROUND the geometry center
             self._apply_transform_to_actor(actor, world_transform)
 
             self.geometry_actors.append(actor)
@@ -120,9 +123,8 @@ class PyVistaViewer(QtInteractor):
                 ]
         return bounds
 
-    # -------------------------------------------------
-    # Grid
-    # -------------------------------------------------
+    
+    # grid
     
     def _add_xy_grid(self):
         grid_size = 200
@@ -144,9 +146,7 @@ class PyVistaViewer(QtInteractor):
             reset_camera=False,
         )
 
-    # -------------------------------------------------
-    # Camera
-    # -------------------------------------------------
+    # camera 
     
     def reset_camera_to_geometry(self):
         if not self.geometry_actors:
@@ -157,16 +157,11 @@ class PyVistaViewer(QtInteractor):
             self.reset_camera(bounds=bounds)
             self.render()
 
-    # -------------------------------------------------
-    # Picking callback
-    # -------------------------------------------------
+
+    # picking callback
     
     def _on_pick(self, *args, **kwargs):
-        """
-        Picking callback - handle different callback signatures.
-        PyVista's callback can pass different arguments.
-        """
-        # Get the actor from the picker object
+        # get the actor from the picker object
         if not hasattr(self, 'picker') or self.picker is None:
             return
 
@@ -175,21 +170,30 @@ class PyVistaViewer(QtInteractor):
         if actor is None:
             return
 
-        # Only process if it's one of our geometry actors
+        # only process if it's one of our geometry actors
         if actor not in self.actor_to_node:
             return
 
         node = self.actor_to_node[actor]
         if node:
-            # Emit signal for controller to handle
+            # emit signal for controller to handle
             self.signals.selection_changed.emit(node)
 
-    # -------------------------------------------------
-    # Keyboard movement
-    # -------------------------------------------------
+
+    # keyboard
     
     def keyPressEvent(self, event):
+        if self.simulation_running:
+            super().keyPressEvent(event)
+            return
+        
         key = event.key()
+
+        if event.modifiers() & Qt.ControlModifier:
+            if event.key() == Qt.Key_S:
+                self.signals.save_scene.emit()
+            if event.key() == Qt.Key_D:
+                self.signals.duplicate_node.emit()
         
         # Shape addition shortcuts
         if key == Qt.Key_1:
@@ -209,7 +213,7 @@ class PyVistaViewer(QtInteractor):
             return
         
         
-        # Deselect
+        # deselect
         if key == Qt.Key_R:
             if self.selected_node is not None:
                 self.deselect_all()
@@ -218,7 +222,7 @@ class PyVistaViewer(QtInteractor):
                 super().keyPressEvent(event)
                 return
         
-        # Movement requires selection
+        # movement requires selection
         if self.selected_node is None:
             super().keyPressEvent(event)
             return
@@ -245,12 +249,9 @@ class PyVistaViewer(QtInteractor):
         if not event.isAutoRepeat():
             self.signals.move_requested.emit(self.selected_node, (dx, dy, dz))
 
-    # -------------------------------------------------
-    # Selection management
-    # -------------------------------------------------
+    # selection management
     
     def deselect_all(self):
-        """Clear selection and emit signal."""
         self.clear_highlight()
         self.selected_actor = None
         self.selected_node = None
@@ -258,7 +259,6 @@ class PyVistaViewer(QtInteractor):
         self.render()
 
     def highlight_node(self, node):
-        """Pure visual highlight. NO callbacks."""
         self.clear_highlight()
         
         if node is None:
@@ -274,15 +274,16 @@ class PyVistaViewer(QtInteractor):
             actor.GetProperty().SetOpacity(0.8)
             self.render()
 
+        self.setFocus()
+
     def clear_highlight(self):
-        """Remove visual highlight only."""
         if self.selected_actor is not None:
             self.selected_actor.GetProperty().SetColor(0.678, 0.847, 0.902)
             self.selected_actor.GetProperty().SetOpacity(0.5)
 
-    # -------------------------------------------------
-    # Transform
-    # -------------------------------------------------
+
+
+    # transformation
     
     def _apply_transform_to_actor(self, actor, transform):
         M = transform.matrix()

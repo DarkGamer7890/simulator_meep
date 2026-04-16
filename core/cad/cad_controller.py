@@ -203,21 +203,20 @@ class CADController:
 
 
     def save_scene(self):
-        from tkinter import Tk, filedialog
+        import sys
+        from PyQt5.QtWidgets import QApplication, QFileDialog
     
-        root = Tk()
-        root.withdraw()  # hide main tkinter window
+        app = QApplication.instance() or QApplication(sys.argv)
     
-        filepath = filedialog.asksaveasfilename(
-            defaultextension=".json",
-            filetypes=[("JSON files", "*.json")],
-            title="Save Scene"
+        filepath, _ = QFileDialog.getSaveFileName(
+            None, "Save Scene", "", "JSON Files (*.json);;All Files (*)"
         )
-    
-        root.destroy()
     
         if not filepath:
             return
+    
+        if not filepath.endswith(".json"):
+            filepath += ".json"
     
         try:
             self.builder.scene.save_scene(filepath)

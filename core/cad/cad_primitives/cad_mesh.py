@@ -1,7 +1,7 @@
 from .primitive import CADPrimitive
 from core.geometry.primitives.mesh import GeometryMesh
 
-class CADMesh(CADPrimitive):   # removed offset
+class CADMesh(CADPrimitive):  
 
     def __init__(self, mesh, pitch, epsilon, **kwargs):
         super().__init__(**kwargs)

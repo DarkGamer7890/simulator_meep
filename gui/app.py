@@ -29,9 +29,7 @@ from gui.hierarchy.hierarchy_panel import HierarchyPanel
 from gui.simulation.plot_panel import PlotPanel
 
 
-# ─────────────────────────────────────────────────────────────
-#  Ribbon helpers
-# ─────────────────────────────────────────────────────────────
+# ribbon helpers
 
 _BTN_STYLE = """
     QToolButton {
@@ -141,15 +139,13 @@ class HomePanel(QWidget):
         edit = RibbonSection("Edit")
         edit.add_btn("🗑", "Delete", controller.delete_selected, "Delete selected (Del)")
         edit.add_btn("⧉", "Duplicate", controller.duplicate_node, "Duplicate selected")
-        edit.add_btn("⧉", "Save", controller.save_scene, "Scene Saved")
+        edit.add_btn("💾", "Save", controller.save_scene, "Scene Saved")
         layout.addWidget(edit)
 
         layout.addStretch()
 
 
-# ─────────────────────────────────────────────────────────────
-#  Ribbon bar — tab buttons switch the body QStackedWidget
-# ─────────────────────────────────────────────────────────────
+#  ribbon bar — tab buttons switch the body
 
 class RibbonBar(QWidget):
     def __init__(self, body_stack: QStackedWidget, parent=None):
@@ -219,9 +215,7 @@ class RibbonBar(QWidget):
         self._tab_btns[idx].setEnabled(enabled)
 
 
-# ─────────────────────────────────────────────────────────────
-#  Status bar
-# ─────────────────────────────────────────────────────────────
+#  status bar
 
 class StatusBar(QWidget):
     def __init__(self, parent=None):
@@ -242,9 +236,7 @@ class StatusBar(QWidget):
         self.label.setText(text)
 
 
-# ─────────────────────────────────────────────────────────────
-#  Main window
-# ─────────────────────────────────────────────────────────────
+#  main window
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -299,6 +291,46 @@ class MainWindow(QMainWindow):
 
         status_bar = StatusBar()
         controller._status_bar = status_bar
+
+
+        # Simulation freeze/unfreeze
+        def _freeze_ui(panels, ribbon_widget):
+            for p in panels:
+                p.setEnabled(False)
+            ribbon_widget.setEnabled(False)
+            viewer.simulation_running = True
+
+
+
+        def _unfreeze_ui(panels, ribbon_widget):
+            for p in panels:
+                p.setEnabled(True)
+            ribbon_widget.setEnabled(True)
+            viewer.simulation_running = False
+
+
+        panels_to_freeze = [hierarchy_panel, property_panel]
+
+
+        app_controller.simulation_started.connect(
+            lambda: _freeze_ui(panels_to_freeze, ribbon)
+        )
+
+
+        app_controller.simulation_finished.connect(
+            lambda: _unfreeze_ui(panels_to_freeze, ribbon)
+        )
+
+
+        app_controller.simulation_error.connect(
+            lambda _: _unfreeze_ui(panels_to_freeze, ribbon)
+        )
+
+
+        app_controller.simulation_cancelled.connect(
+            lambda: _unfreeze_ui(panels_to_freeze, ribbon)
+        )
+
 
         root = QWidget()
         layout = QVBoxLayout(root)

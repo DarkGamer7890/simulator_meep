@@ -15,11 +15,11 @@ class CADBuilder:
 
         geometries = []
 
-        # Add additions
+        # add additions
         for node, geom, transform in result.additions:
             geometries.append((node, geom, transform))
 
-        # Add subtractions (for Meep overwrite behavior)
+        # add subtractions 
         for node, geom, transform in result.subtractions:
             geometries.append((node, geom, transform))
 

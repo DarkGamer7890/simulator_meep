@@ -18,7 +18,7 @@ class Transform:
         rx, ry, rz = self.rotation
         sx, sy, sz = self.scale
 
-        # Scale
+        # scale
         S = np.array([
             [sx, 0,  0,  0],
             [0,  sy, 0,  0],
@@ -26,7 +26,7 @@ class Transform:
             [0,  0,  0,  1],
         ])
 
-        # Rotation (XYZ, local)
+        # rotation (local axis)
         cx, cy, cz = np.cos([rx, ry, rz])
         sx_, sy_, sz_ = np.sin([rx, ry, rz])
 
@@ -53,7 +53,7 @@ class Transform:
 
         R = Rz @ Ry @ Rx
 
-        # Translation
+        # translation
         T = np.array([
             [1, 0, 0, tx],
             [0, 1, 0, ty],

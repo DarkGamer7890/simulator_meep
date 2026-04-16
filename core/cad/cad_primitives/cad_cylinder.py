@@ -33,5 +33,7 @@ class CADCylinder(CADPrimitive):
             "type": "Cylinder",
             "radius": float(self.radius),
             "height": float(self.height),
+            "axis": list(self.axis),
             "epsilon": float(self.epsilon),
+            "center": list(self.center),
         }

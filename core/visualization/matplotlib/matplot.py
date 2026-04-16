@@ -8,7 +8,7 @@ import numpy as np
 class Plotter():
     def __init__(self, eps_sim, ez_dft, figure, canvas, ax, pml, resolution):
 
-        # Extracting data
+        
         self.canvas = canvas
         self.figure = figure
         self.ax = ax
@@ -23,7 +23,6 @@ class Plotter():
         self.phase = np.angle(ez_dft)
 
 
-        # Removing PML layer
         self.crop = int(self.pml * self.resolution)
         self.is_3D = (ez_dft.ndim == 3)
 
@@ -37,7 +36,7 @@ class Plotter():
         print(len(self.magnitude))
 
 
-        # Finding Extent and Focus Coords
+       
 
         self.extent = np.linspace(-self.limit, self.limit, len(self.magnitude))
 
@@ -287,7 +286,7 @@ class Plotter():
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        # 3D: take XY slice at z = center
+
         data = self.magnitude[:, :, self.coords[2]].T
         xlabel = f"X (z = {self.coords[2] - self.center})"
         ylabel = "Y"
@@ -355,7 +354,7 @@ class Plotter():
         self.colorbar = None
         self.ax = self.figure.add_subplot(1, 1, 1)
 
-        # 3D: take XY slice at z = center
+
         data = self.magnitude[self.coords[0], :, :].T
         xlabel = f"Y (x = {self.coords[0] - self.center})"
         ylabel = "Z"

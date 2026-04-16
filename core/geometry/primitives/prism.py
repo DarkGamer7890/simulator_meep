@@ -11,10 +11,10 @@ class Prism(GeometryPrimitive):
     def to_meep(self):
         import meep as mp
 
-        # Convert list vertices to meep.Vector3 objects
+
         meep_vertices = [mp.Vector3(v[0], v[1], v[2]) for v in self.vertices]
     
-        # Convert axis to meep.Vector3
+
         meep_axis = mp.Vector3(self.axis[0], self.axis[1], self.axis[2])
         return mp.Prism(
             center=self.center,
@@ -36,17 +36,17 @@ class Prism(GeometryPrimitive):
         base_verts = np.array(self.vertices, dtype=float)
         n = len(base_verts)
     
-        # --- ENSURE 3D VERTICES ---
+        # ensure 3d vertices
         if base_verts.shape[1] == 2:
             base_verts = np.c_[base_verts, np.zeros(n)]
         elif base_verts.shape[1] != 3:
             raise ValueError("Prism vertices must be 2D or 3D")
     
-        # --- CENTER BASE POLYGON ---
+        # center base polygon
         centroid = base_verts.mean(axis=0)
         base_verts -= centroid
     
-        # --- AXIS ---
+        #axis
         axis = np.array(self.axis, dtype=float)
         axis = axis / np.linalg.norm(axis)
     

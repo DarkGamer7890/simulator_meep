@@ -1,4 +1,5 @@
 import sys
+import multiprocessing
 from pathlib import Path
 
 # add project root to PYTHONPATH
@@ -18,4 +19,5 @@ def main():
 
 
 if __name__ == "__main__":
+    multiprocessing.freeze_support()
     main()
